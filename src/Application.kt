@@ -1,5 +1,6 @@
 package com.phlourenco
 
+import com.phlourenco.arisp.ArispRegistry
 import com.phlourenco.arisp.PersonType
 import com.phlourenco.arisp.SearchType
 import io.ktor.application.*
@@ -77,11 +78,17 @@ fun Application.module(testing: Boolean = false) {
             driver.findElementById("btnPesquisar").click()
             waitUntilPageIsReady(driver)
             driver.executeScript("javascript:SelecionarTudo();")
-
-            driver.findElementsById("btnProsseguir").first { it.isEnabled }?.click()
-            //it.getAttribute("href") != "ProsseguirSolicitacao();"
-
+            driver.findElementsById("btnProsseguir").first { it.isEnabled }?.getAttribute("onclick")?.let {
+                driver.executeScript(it)
+            }
             waitUntilPageIsReady(driver)
+
+            driver.findElementById("panelMatriculas").findElements(By.tagName("tr")).filter { it.isDisplayed }.forEach {
+                val td = it.findElements(By.tagName("td"))
+                val registry = ArispRegistry(cityName = td[0].text, office = td[1].text, registryId = td[2].text, registryFileUrl = "http://link.com/arquivo.pdf")
+                println(registry)
+//                driver.executeScript("javascript:VisualizarMatricula(10,30098);")
+            }
         }
 
         get("/") {
