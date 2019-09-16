@@ -3,6 +3,7 @@ package com.phlourenco
 import com.phlourenco.arisp.ArispRegistry
 import com.phlourenco.arisp.PersonType
 import com.phlourenco.arisp.SearchType
+import com.sun.jna.StringArray
 import io.ktor.application.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -25,20 +26,29 @@ fun Application.module(testing: Boolean = false) {
         }
     }
 
-    routing {
+    fun login(driver: ChromeDriver) {
+        // Faz login no portal do professor. Vai ser removido posteriormente
+        driver.get("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/login")
+        waitUntilPageIsReady(driver)
+        driver.findElementById("username").sendKeys("fiap")
+        driver.findElementById("password").sendKeys("mpsp")
+        driver.findElementByTagName("form").submit()
+        waitUntilPageIsReady(driver)
+    }
 
+    fun fillForm(inputNames: Array<String>, values: Array<String>, driver: ChromeDriver) {
+        for ((index, input) in inputNames.withIndex()) {
+            print("input[name='${input}']");
+            print(values[index]);
+            driver.findElementByCssSelector("input[name='${input}']").sendKeys(values[index])
+        }
+    }
+
+    routing {
         get("/arisp") {
             val driver = ChromeDriver()
+            login(driver);
 
-            // Faz login no portal do professor. Vai ser removido posteriormente
-            driver.get("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/login")
-            waitUntilPageIsReady(driver)
-            driver.findElementById("username").sendKeys("fiap")
-            driver.findElementById("password").sendKeys("mpsp")
-            driver.findElementByTagName("form").submit()
-            waitUntilPageIsReady(driver)
-
-            //ARISP
             driver.navigate().to("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/arisp/login.html")
             waitUntilPageIsReady(driver)
             driver.findElementById("btnCallLogin").click()
@@ -91,9 +101,24 @@ fun Application.module(testing: Boolean = false) {
             }
         }
 
+        get("/sitel") {
+            val driver = ChromeDriver()
+            login(driver);
+
+            driver.navigate().to("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/siel/login.html");
+            driver.findElementByTagName("form").submit();
+            fillForm(
+                inputNames = arrayOf("nome","nome_mae","dt_nascimento","num_titulo", "num_processo"),
+                values = arrayOf("vitor","gertrudes dos santos", "16/04/1999", "123456789123", "2323232"),
+                driver = driver
+            );
+            driver.findElementByCssSelector("input[type='image']").click();
+        }
+
         get("/") {
             call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
         }
+
 
         get("/json/gson") {
             call.respond(mapOf("hello" to "world"))
