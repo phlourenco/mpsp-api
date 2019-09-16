@@ -38,8 +38,6 @@ fun Application.module(testing: Boolean = false) {
 
     fun fillForm(inputNames: Array<String>, values: Array<String>, driver: ChromeDriver) {
         for ((index, input) in inputNames.withIndex()) {
-            print("input[name='${input}']");
-            print(values[index]);
             driver.findElementByCssSelector("input[name='${input}']").sendKeys(values[index])
         }
     }
@@ -101,7 +99,7 @@ fun Application.module(testing: Boolean = false) {
             }
         }
 
-        get("/sitel") {
+        post("/sitel") {
             val driver = ChromeDriver()
             login(driver);
 
