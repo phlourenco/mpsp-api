@@ -1,8 +1,7 @@
 package com.phlourenco
 
-import com.phlourenco.arisp.ArispRegistry
-import com.phlourenco.arisp.PersonType
-import com.phlourenco.arisp.SearchType
+import com.phlourenco.arisp.*;
+import com.phlourenco.sitel.*;
 import com.sun.jna.StringArray
 import io.ktor.application.*
 import io.ktor.response.*
@@ -10,6 +9,9 @@ import io.ktor.routing.*
 import io.ktor.http.*
 import io.ktor.gson.*
 import io.ktor.features.*
+import io.ktor.http.cio.expectHttpBody
+import io.ktor.http.cio.parseHttpBody
+import io.ktor.request.receive
 import org.openqa.selenium.By
 import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.chrome.ChromeDriver
@@ -97,10 +99,11 @@ fun Application.module(testing: Boolean = false) {
                 println(registry)
 //                driver.executeScript("javascript:VisualizarMatricula(10,30098);")
             }
+            driver.close();
         }
 
         post("/sitel") {
-            val driver = ChromeDriver()
+            val driver = ChromeDriver();
             login(driver);
 
             driver.navigate().to("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/siel/login.html");
@@ -111,6 +114,29 @@ fun Application.module(testing: Boolean = false) {
                 driver = driver
             );
             driver.findElementByCssSelector("input[type='image']").click();
+
+            driver.findElements(By.tagName("table")).filter { it.isDisplayed }.forEach {
+                val td = it.findElements(By.tagName("td"));
+
+                val response =  sitelResponse(
+                    td[1].text,
+                    td[3].text,
+                    td[5].text,
+                    td[7].text,
+                    td[9].text,
+                    td[11].text,
+                    td[13].text,
+                    td[15].text,
+                    td[17].text,
+                    td[19].text,
+                    td[21].text,
+                    td[23].text
+                );
+
+                call.respond(response);
+            }
+
+            driver.close();
         }
 
         get("/") {
