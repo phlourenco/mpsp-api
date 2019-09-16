@@ -1,16 +1,13 @@
 package com.phlourenco
 
-import com.phlourenco.arisp.*;
-import com.phlourenco.sitel.*;
-import com.sun.jna.StringArray
+import com.phlourenco.arisp.*
+import com.phlourenco.sitel.*
 import io.ktor.application.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.http.*
 import io.ktor.gson.*
 import io.ktor.features.*
-import io.ktor.http.cio.expectHttpBody
-import io.ktor.http.cio.parseHttpBody
 import io.ktor.request.receive
 import org.openqa.selenium.By
 import org.openqa.selenium.JavascriptExecutor
@@ -38,9 +35,9 @@ fun Application.module(testing: Boolean = false) {
         waitUntilPageIsReady(driver)
     }
 
-    fun fillForm(inputNames: Array<String>, values: Array<String>, driver: ChromeDriver) {
-        for ((index, input) in inputNames.withIndex()) {
-            driver.findElementByCssSelector("input[name='${input}']").sendKeys(values[index])
+    fun fillForm(values: Map<String, String>, driver: ChromeDriver) {
+        values.forEach {
+            driver.findElementByName(it.key).sendKeys(it.value)
         }
     }
 
@@ -103,22 +100,27 @@ fun Application.module(testing: Boolean = false) {
         }
 
         post("/sitel") {
-            val driver = ChromeDriver();
-            login(driver);
+            val req = call.receive<SitelSearch>()
 
-            driver.navigate().to("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/siel/login.html");
-            driver.findElementByTagName("form").submit();
-            fillForm(
-                inputNames = arrayOf("nome","nome_mae","dt_nascimento","num_titulo", "num_processo"),
-                values = arrayOf("vitor","gertrudes dos santos", "16/04/1999", "123456789123", "2323232"),
-                driver = driver
-            );
-            driver.findElementByCssSelector("input[type='image']").click();
+            val driver = ChromeDriver()
+            login(driver)
+
+            driver.navigate().to("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/siel/login.html")
+            driver.findElementByTagName("form").submit()
+
+            waitUntilPageIsReady(driver)
+            driver.findElementByName("nome").sendKeys(req.name)
+            driver.findElementByName("nome_mae").sendKeys(req.motherName)
+            driver.findElementByName("dt_nascimento").sendKeys(req.birthDate)
+            driver.findElementByName("num_titulo").sendKeys(req.documentNumber)
+            driver.findElementByName("num_processo").sendKeys(req.processNumber)
+
+            driver.findElementByCssSelector("input[type='image']").click()
 
             driver.findElements(By.tagName("table")).filter { it.isDisplayed }.forEach {
-                val td = it.findElements(By.tagName("td"));
+                val td = it.findElements(By.tagName("td"))
 
-                val response =  sitelResponse(
+                val response =  SitelResponse(
                     td[1].text,
                     td[3].text,
                     td[5].text,
@@ -131,12 +133,12 @@ fun Application.module(testing: Boolean = false) {
                     td[19].text,
                     td[21].text,
                     td[23].text
-                );
+                )
 
-                call.respond(response);
+                call.respond(response)
             }
 
-            driver.close();
+            driver.close()
         }
 
         get("/") {
