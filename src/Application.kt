@@ -2,6 +2,8 @@ package com.phlourenco
 
 import com.mongodb.MongoClientURI
 import com.phlourenco.arisp.*
+import com.phlourenco.arpensp.ArpenspRequest
+import com.phlourenco.arpensp.ArpenspResponse
 import com.phlourenco.sitel.*
 import io.ktor.application.*
 import io.ktor.response.*
@@ -143,6 +145,47 @@ fun Application.module(testing: Boolean = false) {
             }
 
             driver.close()
+        }
+
+        post("/arpensp") {
+            val req = call.receive<ArpenspRequest>()
+
+            val driver = ChromeDriver()
+            login(driver)
+
+            driver.navigate().to("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/arpensp/login.html")
+
+
+            val firstRow =  driver.findElementById("main").findElement(By.className("container")).findElements(By.className("row")).elementAt(1)
+            firstRow.findElements(By.tagName("a")).first().click()
+            waitUntilPageIsReady(driver)
+
+            driver.findElementByLinkText("C. R. C.").click()
+            driver.findElementByLinkText("Busca na CRC").click()
+            waitUntilPageIsReady(driver)
+
+            driver.findElementById("c").click()
+            driver.findElementByName("numero_processo").sendKeys(req.processNumber)
+            driver.findElementByName("vara_juiz_id").sendKeys("MPSP - Ministério Público de São Paulo")
+            driver.findElementByName("btn_pesquisar").click()
+            waitUntilPageIsReady(driver)
+
+            var spouse1OldName = driver.findElementByName("nome_registrado_1").getAttribute("value")
+            var spouse1NewName = driver.findElementByName("novo_nome_registrado_1").getAttribute("value")
+            var spouse2OldName = driver.findElementByName("nome_registrado_2").getAttribute("value")
+            var spouse2NewName = driver.findElementByName("novo_nome_registrado_2").getAttribute("value")
+            val marriageDate = driver.findElementByName("data_ocorrido").getAttribute("value")
+
+            if (spouse1NewName.isNullOrEmpty()) {
+                spouse1NewName = spouse1OldName
+            }
+
+            if (spouse2NewName.isNullOrEmpty()) {
+                spouse2NewName = spouse2OldName
+            }
+
+            val response = ArpenspResponse(spouse1OldName, spouse1NewName, spouse2OldName, spouse2NewName, marriageDate)
+            call.respond(response)
         }
 
         get("/") {
