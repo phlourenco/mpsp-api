@@ -59,7 +59,7 @@ fun Application.module(testing: Boolean = false) {
             val options = ChromeOptions()
             options.addArguments("disable-infobars")
             options.addArguments("--print-to-pdf")
-            
+
             val driver = ChromeDriver(options)
             login(driver);
 
