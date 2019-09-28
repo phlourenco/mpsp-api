@@ -1,6 +1,7 @@
 package com.phlourenco
 
 import com.phlourenco.arisp.*
+import com.phlourenco.cadesp.CadespResponse
 import com.phlourenco.sitel.*
 import io.ktor.application.*
 import io.ktor.response.*
@@ -9,9 +10,16 @@ import io.ktor.http.*
 import io.ktor.gson.*
 import io.ktor.features.*
 import io.ktor.request.receive
+import org.eclipse.jetty.util.ajax.JSON
+import org.json.JSONObject
+import org.json.JSONStringer
+import org.json.JSONWriter
 import org.openqa.selenium.By
 import org.openqa.selenium.JavascriptExecutor
+import org.openqa.selenium.WebElement
 import org.openqa.selenium.chrome.ChromeDriver
+import org.openqa.selenium.interactions.Actions
+import org.openqa.selenium.support.ui.Select
 import org.openqa.selenium.support.ui.WebDriverWait
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
@@ -99,6 +107,87 @@ fun Application.module(testing: Boolean = false) {
             driver.close();
         }
 
+
+        post("/cadesp") {
+
+            val driver = ChromeDriver()
+
+            login(driver)
+            driver.navigate().to("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/cadesp/login.html")
+
+            inputElementById(driver, "ctl00_conteudoPaginaPlaceHolder_loginControl_UserName", "12345")
+            inputElementById(driver, "ctl00_conteudoPaginaPlaceHolder_loginControl_Password", "12345")
+            clickElementById(driver, "ctl00_conteudoPaginaPlaceHolder_loginControl_loginButton")
+            waitUntilPageIsReady(driver)
+            moveTo(driver, "Consultas",false)
+            moveTo(driver, "Cadastro", true)
+            dropSelectOption(driver, "ctl00_conteudoPaginaPlaceHolder_tcConsultaCompleta_TabPanel1_lstIdentificacao", "2")
+            inputElementById(driver,"ctl00_conteudoPaginaPlaceHolder_tcConsultaCompleta_TabPanel1_txtIdentificacao", "12345678912")
+            clickElementById(driver,"ctl00_conteudoPaginaPlaceHolder_tcConsultaCompleta_TabPanel1_btnConsultarEstabelecimento")
+
+            val td = driver.findElementsByClassName("dadoDetalhe")
+            val tdAll = driver.findElementsByTagName("td")
+
+            var situation: Boolean = false
+            var registrationSituation: Boolean = false
+            var taxOccurrence: Boolean = false
+
+            if(td[4].text == "Situação:  Ativo"){
+                situation = true
+            }
+
+            if(td[23].text == "Ativo"){
+                registrationSituation = true
+            }
+
+            if(tdAll[121].text == "Ativa"){
+                taxOccurrence = true
+            }
+
+            val ie = td[3].text
+            val cnpj = td[5].text
+            val businessName = td[7].text
+            val drt = td[9].text
+            val dateStateRegistration = td[6].text
+            val stateRegime = td[8].text
+            val taxOffice = td[10].text
+            val fantasyName = td[15].text
+            val nire = td[22].text
+            val unitType = td[27].text
+            val ieStartDate = td[20].text
+            val dateStartedSituation = td[24].text
+            val practices = td[29].text
+
+            val response: CadespResponse = CadespResponse(ie, cnpj, businessName, drt, situation, dateStateRegistration, stateRegime, taxOffice, fantasyName, nire, registrationSituation, taxOccurrence, unitType, ieStartDate, dateStartedSituation, practices);
+
+
+
+            call.respond(response)
+
+
+
+
+
+//            response.situation = td[4].text
+//
+//
+//            td.forEach{
+//                println(it.text)
+//                response.cnpj = td[0].
+//            }
+
+
+
+          //  print(td)
+
+           driver.close()
+
+        }
+
+
+
+
+
         post("/sitel") {
             val req = call.receive<SitelSearch>()
 
@@ -150,6 +239,32 @@ fun Application.module(testing: Boolean = false) {
             call.respond(mapOf("hello" to "world"))
         }
     }
+}
+
+
+
+fun moveTo(driver: ChromeDriver,name: String, click: Boolean){
+    if(click){
+        val element = driver.findElementByLinkText(name)
+        Actions(driver).moveToElement(element).perform()
+        element.click()
+    }else {
+        val element = driver.findElementByLinkText(name)
+        Actions(driver).moveToElement(element).perform()
+    }
+}
+
+fun inputElementById(driver: ChromeDriver, elementId: String, keys: String){
+    driver.findElementById(elementId).sendKeys(keys)
+}
+
+fun clickElementById(driver: ChromeDriver, elementId: String){
+    driver.findElementById(elementId).click()
+}
+
+fun dropSelectOption(driver: ChromeDriver, elementId: String, optionValue: String){
+    val drpIdentification = Select(driver.findElement(By.id(elementId)))
+    drpIdentification.selectByValue(optionValue)
 }
 
 fun waitUntilPageIsReady(driver: ChromeDriver) {
