@@ -114,7 +114,6 @@ fun Application.module(testing: Boolean = false) {
 
             login(driver)
             driver.navigate().to("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/cadesp/login.html")
-
             inputElementById(driver, "ctl00_conteudoPaginaPlaceHolder_loginControl_UserName", "12345")
             inputElementById(driver, "ctl00_conteudoPaginaPlaceHolder_loginControl_Password", "12345")
             clickElementById(driver, "ctl00_conteudoPaginaPlaceHolder_loginControl_loginButton")
@@ -157,36 +156,11 @@ fun Application.module(testing: Boolean = false) {
             val ieStartDate = td[20].text
             val dateStartedSituation = td[24].text
             val practices = td[29].text
-
             val response: CadespResponse = CadespResponse(ie, cnpj, businessName, drt, situation, dateStateRegistration, stateRegime, taxOffice, fantasyName, nire, registrationSituation, taxOccurrence, unitType, ieStartDate, dateStartedSituation, practices);
-
-
-
             call.respond(response)
 
-
-
-
-
-//            response.situation = td[4].text
-//
-//
-//            td.forEach{
-//                println(it.text)
-//                response.cnpj = td[0].
-//            }
-
-
-
-          //  print(td)
-
-           driver.close()
-
+            driver.close()
         }
-
-
-
-
 
         post("/sitel") {
             val req = call.receive<SitelSearch>()
