@@ -1,5 +1,6 @@
 package com.phlourenco
 
+import com.mongodb.MongoClientURI
 import com.phlourenco.arisp.*
 import com.phlourenco.sitel.*
 import io.ktor.application.*
@@ -9,6 +10,9 @@ import io.ktor.http.*
 import io.ktor.gson.*
 import io.ktor.features.*
 import io.ktor.request.receive
+import org.bson.Document
+import org.litote.kmongo.KMongo
+import org.litote.kmongo.insertOne
 import org.openqa.selenium.By
 import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.chrome.ChromeDriver
@@ -144,7 +148,6 @@ fun Application.module(testing: Boolean = false) {
         get("/") {
             call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
         }
-
 
         get("/json/gson") {
             call.respond(mapOf("hello" to "world"))
