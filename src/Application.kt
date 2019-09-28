@@ -1,7 +1,14 @@
 package com.phlourenco
 
+import com.google.gson.Gson
+import com.google.gson.JsonParser
+import com.mongodb.MongoClientURI
+import com.mongodb.util.JSON
+import com.phlourenco.Database.dbConnection
 import com.phlourenco.arisp.*
 import com.phlourenco.cadesp.CadespResponse
+import com.phlourenco.arpensp.ArpenspRequest
+import com.phlourenco.arpensp.ArpenspResponse
 import com.phlourenco.sitel.*
 import io.ktor.application.*
 import io.ktor.response.*
@@ -14,6 +21,11 @@ import org.eclipse.jetty.util.ajax.JSON
 import org.json.JSONObject
 import org.json.JSONStringer
 import org.json.JSONWriter
+import jdk.nashorn.internal.parser.JSONParser
+import org.bson.Document
+import org.litote.kmongo.KMongo
+import org.litote.kmongo.insertOne
+import org.litote.kmongo.json
 import org.openqa.selenium.By
 import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.WebElement
@@ -28,6 +40,8 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 @kotlin.jvm.JvmOverloads
 
 fun Application.module(testing: Boolean = false) {
+    val dbConnection: dbConnection = dbConnection()
+
     install(ContentNegotiation) {
         gson {
         }
@@ -204,10 +218,58 @@ fun Application.module(testing: Boolean = false) {
             driver.close()
         }
 
+        post("/arpensp") {
+            val req = call.receive<ArpenspRequest>()
+
+            val driver = ChromeDriver()
+            login(driver)
+
+            driver.navigate().to("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/arpensp/login.html")
+
+
+            val firstRow =  driver.findElementById("main").findElement(By.className("container")).findElements(By.className("row")).elementAt(1)
+            firstRow.findElements(By.tagName("a")).first().click()
+            waitUntilPageIsReady(driver)
+
+            driver.findElementByLinkText("C. R. C.").click()
+            driver.findElementByLinkText("Busca na CRC").click()
+            waitUntilPageIsReady(driver)
+
+            driver.findElementById("c").click()
+            driver.findElementByName("numero_processo").sendKeys(req.processNumber)
+            driver.findElementByName("vara_juiz_id").sendKeys("MPSP - Ministério Público de São Paulo")
+            driver.findElementByName("btn_pesquisar").click()
+            waitUntilPageIsReady(driver)
+
+            var spouse1OldName = driver.findElementByName("nome_registrado_1").getAttribute("value")
+            var spouse1NewName = driver.findElementByName("novo_nome_registrado_1").getAttribute("value")
+            var spouse2OldName = driver.findElementByName("nome_registrado_2").getAttribute("value")
+            var spouse2NewName = driver.findElementByName("novo_nome_registrado_2").getAttribute("value")
+            val marriageDate = driver.findElementByName("data_ocorrido").getAttribute("value")
+
+            if (spouse1NewName.isNullOrEmpty()) {
+                spouse1NewName = spouse1OldName
+            }
+
+            if (spouse2NewName.isNullOrEmpty()) {
+                spouse2NewName = spouse2OldName
+            }
+
+            val response: ArpenspResponse = ArpenspResponse(spouse1OldName, spouse1NewName, spouse2OldName, spouse2NewName, marriageDate)
+
+            driver.close()
+            call.respond(response)
+            val gson = Gson()
+            val objJson = gson.toJson(response)
+
+            dbConnection.insert("Arpensp", objJson.toString())
+
+
+        }
+
         get("/") {
             call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
         }
-
 
         get("/json/gson") {
             call.respond(mapOf("hello" to "world"))
