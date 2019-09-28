@@ -2,8 +2,6 @@ package com.phlourenco
 
 import com.google.gson.Gson
 import com.google.gson.JsonParser
-import com.mongodb.MongoClientURI
-import com.mongodb.util.JSON
 import com.phlourenco.Database.dbConnection
 import com.phlourenco.arisp.*
 import com.phlourenco.cadesp.CadespResponse
@@ -17,15 +15,6 @@ import io.ktor.http.*
 import io.ktor.gson.*
 import io.ktor.features.*
 import io.ktor.request.receive
-import org.eclipse.jetty.util.ajax.JSON
-import org.json.JSONObject
-import org.json.JSONStringer
-import org.json.JSONWriter
-import jdk.nashorn.internal.parser.JSONParser
-import org.bson.Document
-import org.litote.kmongo.KMongo
-import org.litote.kmongo.insertOne
-import org.litote.kmongo.json
 import org.openqa.selenium.By
 import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.WebElement
@@ -120,7 +109,6 @@ fun Application.module(testing: Boolean = false) {
             }
             driver.close();
         }
-
 
         post("/cadesp") {
 
@@ -258,13 +246,12 @@ fun Application.module(testing: Boolean = false) {
             val response: ArpenspResponse = ArpenspResponse(spouse1OldName, spouse1NewName, spouse2OldName, spouse2NewName, marriageDate)
 
             driver.close()
-            call.respond(response)
+
             val gson = Gson()
             val objJson = gson.toJson(response)
 
             dbConnection.insert("Arpensp", objJson.toString())
-
-
+            call.respond(response)
         }
 
         get("/") {
