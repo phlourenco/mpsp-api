@@ -1,5 +1,6 @@
 package com.phlourenco
 
+import ch.qos.logback.core.util.FileUtil
 import com.phlourenco.arisp.*
 import com.phlourenco.sitel.*
 import io.ktor.application.*
@@ -9,10 +10,22 @@ import io.ktor.http.*
 import io.ktor.gson.*
 import io.ktor.features.*
 import io.ktor.request.receive
+import javafx.scene.chart.ValueAxis
 import org.openqa.selenium.By
 import org.openqa.selenium.JavascriptExecutor
+import org.openqa.selenium.OutputType
+import org.openqa.selenium.TakesScreenshot
 import org.openqa.selenium.chrome.ChromeDriver
+import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.support.ui.WebDriverWait
+import java.io.File
+import org.openqa.selenium.WebElement
+import java.awt.SystemColor.window
+import org.openqa.selenium.support.ui.ExpectedConditions
+
+
+
+
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -43,7 +56,11 @@ fun Application.module(testing: Boolean = false) {
 
     routing {
         get("/arisp") {
-            val driver = ChromeDriver()
+            val options = ChromeOptions()
+            options.addArguments("disable-infobars")
+            options.addArguments("--print-to-pdf")
+            
+            val driver = ChromeDriver(options)
             login(driver);
 
             driver.navigate().to("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/arisp/login.html")
@@ -145,6 +162,49 @@ fun Application.module(testing: Boolean = false) {
             call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
         }
 
+        get(path = "/infocrim") {
+            val driver = ChromeDriver()
+            login(driver)
+            driver.navigate().to("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/infocrim/login.html")
+            waitUntilPageIsReady(driver)
+            driver.findElementByName("cd_usuario").sendKeys("fiap")
+            driver.findElementByName("cd_senha").sendKeys("mpsp")
+
+            driver.findElementByName("cd_senha").findElement(By.xpath("./..")).findElement(By.xpath("./..")).findElements(By.tagName("td")).last().findElements(By.tagName("a")).first().click()
+            waitUntilPageIsReady(driver)
+            driver.findElementById("enviar").click()
+            waitUntilPageIsReady(driver)
+
+
+
+            driver.findElementsByClassName("linhaDet").forEach {
+                if (!it.findElements(By.tagName("a")).isNullOrEmpty()) {
+                    it.findElement(By.tagName("a")).click()
+                    waitUntilPageIsReady(driver)
+                    val screenshot = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
+                    driver.executeScript(" javascript:imprime();")
+                    driver.executeScript("window.scrollBy(0,1000)");
+                    return@get
+                }
+            }
+
+
+
+
+
+//            val screenshotFile = (driver as TakesScreenshot)?.getScreenshotAs(OutputType.FILE)
+//            print(screenshotFile.absolutePath)
+//            driver.navigate().to(screenshotFile.absolutePath)
+
+//            val firstLink =  driver.findElementsByClassName("linhaDet").first {
+//                (it.findElement(By.tagName("a")) != null)
+//            }
+//
+//            firstLink.click()
+
+
+
+        }
 
         get("/json/gson") {
             call.respond(mapOf("hello" to "world"))
@@ -156,4 +216,8 @@ fun waitUntilPageIsReady(driver: ChromeDriver) {
     val executor = driver as JavascriptExecutor
     WebDriverWait(driver, 1)
         .until { executor.executeScript("return document.readyState") == "complete" }
+}
+
+fun  expandShadowRoot(parent: WebElement, driver: ChromeDriver): WebElement {
+    return driver.executeScript("return arguments[0].shadowRoot", parent) as WebElement
 }
