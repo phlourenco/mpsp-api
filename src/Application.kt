@@ -1,6 +1,10 @@
 package com.phlourenco
 
+import com.google.gson.Gson
+import com.google.gson.JsonParser
 import com.mongodb.MongoClientURI
+import com.mongodb.util.JSON
+import com.phlourenco.Database.dbConnection
 import com.phlourenco.arisp.*
 import com.phlourenco.arpensp.ArpenspRequest
 import com.phlourenco.arpensp.ArpenspResponse
@@ -12,9 +16,11 @@ import io.ktor.http.*
 import io.ktor.gson.*
 import io.ktor.features.*
 import io.ktor.request.receive
+import jdk.nashorn.internal.parser.JSONParser
 import org.bson.Document
 import org.litote.kmongo.KMongo
 import org.litote.kmongo.insertOne
+import org.litote.kmongo.json
 import org.openqa.selenium.By
 import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.chrome.ChromeDriver
@@ -26,6 +32,8 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 @kotlin.jvm.JvmOverloads
 
 fun Application.module(testing: Boolean = false) {
+    val dbConnection: dbConnection = dbConnection()
+
     install(ContentNegotiation) {
         gson {
         }
@@ -184,8 +192,16 @@ fun Application.module(testing: Boolean = false) {
                 spouse2NewName = spouse2OldName
             }
 
-            val response = ArpenspResponse(spouse1OldName, spouse1NewName, spouse2OldName, spouse2NewName, marriageDate)
+            val response: ArpenspResponse = ArpenspResponse(spouse1OldName, spouse1NewName, spouse2OldName, spouse2NewName, marriageDate)
+
+            driver.close()
             call.respond(response)
+            val gson = Gson()
+            val objJson = gson.toJson(response)
+
+            dbConnection.insert("Arpensp", objJson.toString())
+
+
         }
 
         get("/") {
