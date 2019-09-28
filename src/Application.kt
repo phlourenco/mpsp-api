@@ -1,7 +1,11 @@
 package com.phlourenco
 
-import ch.qos.logback.core.util.FileUtil
+import com.google.gson.Gson
+import com.phlourenco.Database.dbConnection
 import com.phlourenco.arisp.*
+import com.phlourenco.cadesp.CadespResponse
+import com.phlourenco.arpensp.ArpenspRequest
+import com.phlourenco.arpensp.ArpenspResponse
 import com.phlourenco.sitel.*
 import io.ktor.application.*
 import io.ktor.response.*
@@ -10,21 +14,12 @@ import io.ktor.http.*
 import io.ktor.gson.*
 import io.ktor.features.*
 import io.ktor.request.receive
-import javafx.scene.chart.ValueAxis
-import org.openqa.selenium.By
-import org.openqa.selenium.JavascriptExecutor
-import org.openqa.selenium.OutputType
-import org.openqa.selenium.TakesScreenshot
-import org.openqa.selenium.chrome.ChromeDriver
+import org.openqa.selenium.*
 import org.openqa.selenium.chrome.ChromeOptions
+import org.openqa.selenium.chrome.ChromeDriver
+import org.openqa.selenium.interactions.Actions
+import org.openqa.selenium.support.ui.Select
 import org.openqa.selenium.support.ui.WebDriverWait
-import java.io.File
-import org.openqa.selenium.WebElement
-import java.awt.SystemColor.window
-import org.openqa.selenium.support.ui.ExpectedConditions
-
-
-
 
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
@@ -33,6 +28,8 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 @kotlin.jvm.JvmOverloads
 
 fun Application.module(testing: Boolean = false) {
+    val dbConnection: dbConnection = dbConnection()
+
     install(ContentNegotiation) {
         gson {
         }
@@ -116,6 +113,61 @@ fun Application.module(testing: Boolean = false) {
             driver.close();
         }
 
+
+        post("/cadesp") {
+
+            val driver = ChromeDriver()
+
+            login(driver)
+            driver.navigate().to("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/cadesp/login.html")
+            inputElementById(driver, "ctl00_conteudoPaginaPlaceHolder_loginControl_UserName", "12345")
+            inputElementById(driver, "ctl00_conteudoPaginaPlaceHolder_loginControl_Password", "12345")
+            clickElementById(driver, "ctl00_conteudoPaginaPlaceHolder_loginControl_loginButton")
+            waitUntilPageIsReady(driver)
+            moveTo(driver, "Consultas",false)
+            moveTo(driver, "Cadastro", true)
+            dropSelectOption(driver, "ctl00_conteudoPaginaPlaceHolder_tcConsultaCompleta_TabPanel1_lstIdentificacao", "2")
+            inputElementById(driver,"ctl00_conteudoPaginaPlaceHolder_tcConsultaCompleta_TabPanel1_txtIdentificacao", "12345678912")
+            clickElementById(driver,"ctl00_conteudoPaginaPlaceHolder_tcConsultaCompleta_TabPanel1_btnConsultarEstabelecimento")
+
+            val td = driver.findElementsByClassName("dadoDetalhe")
+            val tdAll = driver.findElementsByTagName("td")
+
+            var situation: Boolean = false
+            var registrationSituation: Boolean = false
+            var taxOccurrence: Boolean = false
+
+            if(td[4].text == "Situação:  Ativo"){
+                situation = true
+            }
+
+            if(td[23].text == "Ativo"){
+                registrationSituation = true
+            }
+
+            if(tdAll[121].text == "Ativa"){
+                taxOccurrence = true
+            }
+
+            val ie = td[3].text
+            val cnpj = td[5].text
+            val businessName = td[7].text
+            val drt = td[9].text
+            val dateStateRegistration = td[6].text
+            val stateRegime = td[8].text
+            val taxOffice = td[10].text
+            val fantasyName = td[15].text
+            val nire = td[22].text
+            val unitType = td[27].text
+            val ieStartDate = td[20].text
+            val dateStartedSituation = td[24].text
+            val practices = td[29].text
+            val response: CadespResponse = CadespResponse(ie, cnpj, businessName, drt, situation, dateStateRegistration, stateRegime, taxOffice, fantasyName, nire, registrationSituation, taxOccurrence, unitType, ieStartDate, dateStartedSituation, practices);
+            call.respond(response)
+
+            driver.close()
+        }
+
         post("/sitel") {
             val req = call.receive<SitelSearch>()
 
@@ -158,6 +210,55 @@ fun Application.module(testing: Boolean = false) {
             driver.close()
         }
 
+        post("/arpensp") {
+            val req = call.receive<ArpenspRequest>()
+
+            val driver = ChromeDriver()
+            login(driver)
+
+            driver.navigate().to("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/arpensp/login.html")
+
+
+            val firstRow =  driver.findElementById("main").findElement(By.className("container")).findElements(By.className("row")).elementAt(1)
+            firstRow.findElements(By.tagName("a")).first().click()
+            waitUntilPageIsReady(driver)
+
+            driver.findElementByLinkText("C. R. C.").click()
+            driver.findElementByLinkText("Busca na CRC").click()
+            waitUntilPageIsReady(driver)
+
+            driver.findElementById("c").click()
+            driver.findElementByName("numero_processo").sendKeys(req.processNumber)
+            driver.findElementByName("vara_juiz_id").sendKeys("MPSP - Ministério Público de São Paulo")
+            driver.findElementByName("btn_pesquisar").click()
+            waitUntilPageIsReady(driver)
+
+            var spouse1OldName = driver.findElementByName("nome_registrado_1").getAttribute("value")
+            var spouse1NewName = driver.findElementByName("novo_nome_registrado_1").getAttribute("value")
+            var spouse2OldName = driver.findElementByName("nome_registrado_2").getAttribute("value")
+            var spouse2NewName = driver.findElementByName("novo_nome_registrado_2").getAttribute("value")
+            val marriageDate = driver.findElementByName("data_ocorrido").getAttribute("value")
+
+            if (spouse1NewName.isNullOrEmpty()) {
+                spouse1NewName = spouse1OldName
+            }
+
+            if (spouse2NewName.isNullOrEmpty()) {
+                spouse2NewName = spouse2OldName
+            }
+
+            val response: ArpenspResponse = ArpenspResponse(spouse1OldName, spouse1NewName, spouse2OldName, spouse2NewName, marriageDate)
+
+            driver.close()
+            call.respond(response)
+            val gson = Gson()
+            val objJson = gson.toJson(response)
+
+            dbConnection.insert("Arpensp", objJson.toString())
+
+
+        }
+
         get("/") {
             call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
         }
@@ -188,28 +289,38 @@ fun Application.module(testing: Boolean = false) {
                 }
             }
 
-
-
-
-
-//            val screenshotFile = (driver as TakesScreenshot)?.getScreenshotAs(OutputType.FILE)
-//            print(screenshotFile.absolutePath)
-//            driver.navigate().to(screenshotFile.absolutePath)
-
-//            val firstLink =  driver.findElementsByClassName("linhaDet").first {
-//                (it.findElement(By.tagName("a")) != null)
-//            }
-//
-//            firstLink.click()
-
-
-
         }
 
         get("/json/gson") {
             call.respond(mapOf("hello" to "world"))
         }
     }
+}
+
+
+
+fun moveTo(driver: ChromeDriver,name: String, click: Boolean){
+    if(click){
+        val element = driver.findElementByLinkText(name)
+        Actions(driver).moveToElement(element).perform()
+        element.click()
+    }else {
+        val element = driver.findElementByLinkText(name)
+        Actions(driver).moveToElement(element).perform()
+    }
+}
+
+fun inputElementById(driver: ChromeDriver, elementId: String, keys: String){
+    driver.findElementById(elementId).sendKeys(keys)
+}
+
+fun clickElementById(driver: ChromeDriver, elementId: String){
+    driver.findElementById(elementId).click()
+}
+
+fun dropSelectOption(driver: ChromeDriver, elementId: String, optionValue: String){
+    val drpIdentification = Select(driver.findElement(By.id(elementId)))
+    drpIdentification.selectByValue(optionValue)
 }
 
 fun waitUntilPageIsReady(driver: ChromeDriver) {
