@@ -94,6 +94,7 @@ fun Application.module(testing: Boolean = false) {
                 }
             }
             driver.findElementById("chkHabilitar").click()
+            waitUntilPageIsReady(driver)
             driver.findElementById("Prosseguir").click()
             waitUntilPageIsReady(driver)
 
@@ -116,10 +117,12 @@ fun Application.module(testing: Boolean = false) {
             driver.close();
         }
 
-        post("/cadesp") {
+        get("/cadesp/{cnpj}") {
 
             val driver = ChromeDriver()
+            val parameter = call.parameters["cnpj"] ?: "";
 
+            if(parameter.isNullOrEmpty())
             login(driver)
             driver.navigate().to("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/cadesp/login.html")
             inputElementById(driver, "ctl00_conteudoPaginaPlaceHolder_loginControl_UserName", "12345")
@@ -129,7 +132,7 @@ fun Application.module(testing: Boolean = false) {
             moveTo(driver, "Consultas",false)
             moveTo(driver, "Cadastro", true)
             dropSelectOption(driver, "ctl00_conteudoPaginaPlaceHolder_tcConsultaCompleta_TabPanel1_lstIdentificacao", "2")
-            inputElementById(driver,"ctl00_conteudoPaginaPlaceHolder_tcConsultaCompleta_TabPanel1_txtIdentificacao", "12345678912")
+            inputElementById(driver,"ctl00_conteudoPaginaPlaceHolder_tcConsultaCompleta_TabPanel1_txtIdentificacao", parameter)
             clickElementById(driver,"ctl00_conteudoPaginaPlaceHolder_tcConsultaCompleta_TabPanel1_btnConsultarEstabelecimento")
 
             val td = driver.findElementsByClassName("dadoDetalhe")
@@ -172,7 +175,6 @@ fun Application.module(testing: Boolean = false) {
 
         post("/sitel") {
             val req = call.receive<SitelSearch>()
-
             val driver = ChromeDriver()
             login(driver)
 
@@ -260,11 +262,7 @@ fun Application.module(testing: Boolean = false) {
             call.respond(response)
         }
 
-        get("/") {
-            call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
-        }
-
-        get(path = "/infocrim") {
+        get("/infocrim") {
             val driver = ChromeDriver()
             login(driver)
             driver.navigate().to("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/infocrim/login.html")
@@ -276,8 +274,6 @@ fun Application.module(testing: Boolean = false) {
             waitUntilPageIsReady(driver)
             driver.findElementById("enviar").click()
             waitUntilPageIsReady(driver)
-
-
 
             driver.findElementsByClassName("linhaDet").forEach {
                 if (!it.findElements(By.tagName("a")).isNullOrEmpty()) {
@@ -291,6 +287,11 @@ fun Application.module(testing: Boolean = false) {
             }
 
         }
+
+        get("/") {
+            call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
+        }
+
 
         get("/json/gson") {
             call.respond(mapOf("hello" to "world"))
