@@ -108,12 +108,16 @@ fun Application.module(testing: Boolean = false) {
             }
             waitUntilPageIsReady(driver)
 
+            val registries = mutableListOf<ArispRegistry>()
             driver.findElementById("panelMatriculas").findElements(By.tagName("tr")).filter { it.isDisplayed }.forEach {
                 val td = it.findElements(By.tagName("td"))
-                val registry = ArispRegistry(cityName = td[0].text, office = td[1].text, registryId = td[2].text, registryFileUrl = "http://link.com/arquivo.pdf")
+                val pdfLink = td[3].findElements(By.tagName("a")).first().getAttribute("href")
+                val registry = ArispRegistry(cityName = td[0].text, office = td[1].text, registryId = td[2].text, registryFileUrl = pdfLink)
                 println(registry)
+                registries.add(registry)
 //                driver.executeScript("javascript:VisualizarMatricula(10,30098);")
             }
+            call.respond(ArispResponse(registries))
             driver.close();
         }
 
