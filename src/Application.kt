@@ -6,7 +6,9 @@ import com.phlourenco.arisp.*
 import com.phlourenco.cadesp.CadespResponse
 import com.phlourenco.arpensp.ArpenspRequest
 import com.phlourenco.arpensp.ArpenspResponse
-import com.phlourenco.sitel.*
+import com.phlourenco.cadesp.CadespRequest
+import definitions.SitelResponse
+import definitions.SitelSearch
 import io.ktor.application.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -55,8 +57,9 @@ fun Application.module(testing: Boolean = false) {
     }
 
     routing {
-        get("/arisp") {
+        get("/arisp/{cnpj}") {
             val options = ChromeOptions()
+            val cnpj = call.parameters["cnpj"]
             options.addArguments("disable-infobars")
             options.addArguments("--print-to-pdf")
 
@@ -95,11 +98,12 @@ fun Application.module(testing: Boolean = false) {
             }
             driver.findElementById("chkHabilitar").click()
             waitUntilPageIsReady(driver)
+            (driver as JavascriptExecutor).executeScript("window.scrollBy(0,500)")
             driver.findElementById("Prosseguir").click()
             waitUntilPageIsReady(driver)
 
             driver.findElementById("filterTipo").sendKeys(PersonType.juridica.getTitle())
-            driver.findElementById("filterDocumento").sendKeys("12019797658")
+            driver.findElementById("filterDocumento").sendKeys(cnpj)
             driver.findElementById("btnPesquisar").click()
             waitUntilPageIsReady(driver)
             driver.executeScript("javascript:SelecionarTudo();")
@@ -124,9 +128,9 @@ fun Application.module(testing: Boolean = false) {
         get("/cadesp/{cnpj}") {
 
             val driver = ChromeDriver()
-            val parameter = call.parameters["cnpj"] ?: "";
 
-            if(parameter.isNullOrEmpty())
+            val cadespRequest: CadespRequest = CadespRequest(call.parameters["cnpj"]!!)
+
             login(driver)
             driver.navigate().to("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/cadesp/login.html")
             inputElementById(driver, "ctl00_conteudoPaginaPlaceHolder_loginControl_UserName", "12345")
@@ -136,7 +140,7 @@ fun Application.module(testing: Boolean = false) {
             moveTo(driver, "Consultas",false)
             moveTo(driver, "Cadastro", true)
             dropSelectOption(driver, "ctl00_conteudoPaginaPlaceHolder_tcConsultaCompleta_TabPanel1_lstIdentificacao", "2")
-            inputElementById(driver,"ctl00_conteudoPaginaPlaceHolder_tcConsultaCompleta_TabPanel1_txtIdentificacao", parameter)
+            inputElementById(driver,"ctl00_conteudoPaginaPlaceHolder_tcConsultaCompleta_TabPanel1_txtIdentificacao", cadespRequest.cnpj)
             clickElementById(driver,"ctl00_conteudoPaginaPlaceHolder_tcConsultaCompleta_TabPanel1_btnConsultarEstabelecimento")
 
             val td = driver.findElementsByClassName("dadoDetalhe")
@@ -172,8 +176,8 @@ fun Application.module(testing: Boolean = false) {
             val dateStartedSituation = td[24].text
             val practices = td[29].text
             val response: CadespResponse = CadespResponse(ie, cnpj, businessName, drt, situation, dateStateRegistration, stateRegime, taxOffice, fantasyName, nire, registrationSituation, taxOccurrence, unitType, ieStartDate, dateStartedSituation, practices);
-            call.respond(response)
 
+            call.respond(response)
             driver.close()
         }
 
@@ -197,7 +201,7 @@ fun Application.module(testing: Boolean = false) {
             driver.findElements(By.tagName("table")).filter { it.isDisplayed }.forEach {
                 val td = it.findElements(By.tagName("td"))
 
-                val response =  SitelResponse(
+                val response = SitelResponse(
                     td[1].text,
                     td[3].text,
                     td[5].text,
@@ -219,14 +223,12 @@ fun Application.module(testing: Boolean = false) {
         }
 
         post("/arpensp") {
-            val req = call.receive<ArpenspRequest>()
+            val arpenspRequest = call.receive<ArpenspRequest>()
 
             val driver = ChromeDriver()
             login(driver)
 
             driver.navigate().to("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/arpensp/login.html")
-
-
             val firstRow =  driver.findElementById("main").findElement(By.className("container")).findElements(By.className("row")).elementAt(1)
             firstRow.findElements(By.tagName("a")).first().click()
             waitUntilPageIsReady(driver)
@@ -236,7 +238,7 @@ fun Application.module(testing: Boolean = false) {
             waitUntilPageIsReady(driver)
 
             driver.findElementById("c").click()
-            driver.findElementByName("numero_processo").sendKeys(req.processNumber)
+            driver.findElementByName("numero_processo").sendKeys(arpenspRequest.processNumber)
             driver.findElementByName("vara_juiz_id").sendKeys("MPSP - Ministério Público de São Paulo")
             driver.findElementByName("btn_pesquisar").click()
             waitUntilPageIsReady(driver)
