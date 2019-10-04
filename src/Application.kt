@@ -7,6 +7,7 @@ import com.phlourenco.cadesp.CadespResponse
 import com.phlourenco.arpensp.ArpenspRequest
 import com.phlourenco.arpensp.ArpenspResponse
 import com.phlourenco.cadesp.CadespRequest
+import com.phlourenco.definitions.SivecRequest
 import definitions.SitelResponse
 import definitions.SitelSearch
 import io.ktor.application.*
@@ -291,6 +292,21 @@ fun Application.module(testing: Boolean = false) {
                     return@get
                 }
             }
+
+        }
+
+        post("/sivec") {
+            val req = this.call.receive<SivecRequest>()
+            val driver = ChromeDriver()
+            login(driver)
+            driver.navigate().to("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/sivec/login.html")
+            waitUntilPageIsReady(driver)
+            driver.findElementByName("nomeusuario").sendKeys("fiap")
+            driver.findElementByName("senhausuario").sendKeys("mpsp")
+            driver.findElementByName("Acessar").click()
+            waitUntilPageIsReady(driver)
+            driver.findElementById("1").click()
+
 
         }
 
