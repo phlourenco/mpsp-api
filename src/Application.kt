@@ -57,9 +57,12 @@ fun Application.module(testing: Boolean = false) {
     }
 
     routing {
-        get("/arisp/{cnpj}") {
+        post("/arisp") {
+            val req = call.receive<ArispRequest>()
+
             val options = ChromeOptions()
-            val cnpj = call.parameters["cnpj"]
+
+            val searchType: SearchType;
             options.addArguments("disable-infobars")
             options.addArguments("--print-to-pdf")
 
@@ -77,7 +80,7 @@ fun Application.module(testing: Boolean = false) {
             driver.navigate().to(solicitacoesMenuItem.getAttribute("href"))
             waitUntilPageIsReady(driver)
 
-            driver.findElementById("TipoPesquisa").sendKeys(SearchType.pessoa.getTitle())
+            driver.executeScript("document.getElementById('TipoPesquisa').value =" + req.searchType);
             driver.findElementById("Prosseguir").click()
             waitUntilPageIsReady(driver)
 
@@ -96,6 +99,7 @@ fun Application.module(testing: Boolean = false) {
                     }
                 }
             }
+            waitUntilPageIsReady(driver)
             driver.findElementById("chkHabilitar").click()
             waitUntilPageIsReady(driver)
             (driver as JavascriptExecutor).executeScript("window.scrollBy(0,500)")
@@ -103,7 +107,9 @@ fun Application.module(testing: Boolean = false) {
             waitUntilPageIsReady(driver)
 
             driver.findElementById("filterTipo").sendKeys(PersonType.juridica.getTitle())
-            driver.findElementById("filterDocumento").sendKeys(cnpj)
+
+            driver.executeScript("document.getElementById('filterTipo').value =" + req.personType);
+            driver.findElementById("filterDocumento").sendKeys(req.cpfCnpj)
             driver.findElementById("btnPesquisar").click()
             waitUntilPageIsReady(driver)
             driver.executeScript("javascript:SelecionarTudo();")
@@ -295,9 +301,8 @@ fun Application.module(testing: Boolean = false) {
         }
 
         get("/") {
-            call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
+            call.respondText("chambra", contentType = ContentType.Text.Plain)
         }
-
 
         get("/json/gson") {
             call.respond(mapOf("hello" to "world"))

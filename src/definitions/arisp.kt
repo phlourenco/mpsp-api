@@ -1,8 +1,8 @@
 package com.phlourenco.arisp
 
 data class ArispRequest(
-    val searchType: SearchType,
-    val personType: PersonType,
+    val searchType: Int,
+    val personType: Int,
     val cityNames: List<String>?,
     val cpfCnpj: String
 )
