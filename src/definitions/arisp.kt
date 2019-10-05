@@ -27,6 +27,18 @@ interface IStrEnum {
 }
 
 enum class SearchType: IIntEnum, IStrEnum {
+    enderecoRua {
+        override fun getValue() = 1
+        override fun getTitle() = "Endereço Rua"
+    },
+    enderecoEdificio {
+        override fun getValue() = 2
+        override fun getTitle() = "Endereço Edifício"
+    },
+    enderecoLoteamento {
+        override fun getValue() = 3
+        override fun getTitle() = "Endereço Loteamento"
+    },
     matricula {
         override fun getValue() = 4
         override fun getTitle() = "Matrícula"
@@ -39,18 +51,6 @@ enum class SearchType: IIntEnum, IStrEnum {
         override fun getValue() = 6
         override fun getTitle() = "Pessoa"
     },
-    enderecoRua {
-        override fun getValue() = 1
-        override fun getTitle() = "Endereço Rua"
-    },
-    enderecoEdificio {
-        override fun getValue() = 2
-        override fun getTitle() = "Endereço Edifício"
-    },
-    enderecoLoteamento {
-        override fun getValue() = 3
-        override fun getTitle() = "Endereço Loteamento"
-    }
 }
 
 enum class PersonType: IIntEnum, IStrEnum {
