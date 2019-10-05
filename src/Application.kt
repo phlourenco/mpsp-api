@@ -123,11 +123,13 @@ fun Application.module(testing: Boolean = false) {
                 val td = it.findElements(By.tagName("td"))
                 val pdfLink = td[3].findElements(By.tagName("a")).first().getAttribute("href")
                 val registry = ArispRegistry(cityName = td[0].text, office = td[1].text, registryId = td[2].text, registryFileUrl = pdfLink)
-                println(registry)
                 registries.add(registry)
 //                driver.executeScript("javascript:VisualizarMatricula(10,30098);")
             }
-            call.respond(ArispResponse(registries))
+
+            val response = ArispResponse(registries);
+            dbConnection.insert("arisp", response.toString())
+            call.respond(response)
             driver.close();
         }
 
@@ -184,10 +186,11 @@ fun Application.module(testing: Boolean = false) {
             val response: CadespResponse = CadespResponse(ie, cnpj, businessName, drt, situation, dateStateRegistration, stateRegime, taxOffice, fantasyName, nire, registrationSituation, taxOccurrence, unitType, ieStartDate, dateStartedSituation, practices);
 
             call.respond(response)
+            dbConnection.insert("cadesp", response.toString())
             driver.close()
         }
 
-        post("/sitel") {
+        post("/siel") {
             val req = call.receive<SitelSearch>()
             val driver = ChromeDriver()
             login(driver)
@@ -222,6 +225,7 @@ fun Application.module(testing: Boolean = false) {
                     td[23].text
                 )
 
+                dbConnection.insert("siel", response.toString())
                 call.respond(response)
             }
 
