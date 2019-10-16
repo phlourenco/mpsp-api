@@ -7,7 +7,9 @@ import com.phlourenco.cadesp.CadespResponse
 import com.phlourenco.arpensp.ArpenspRequest
 import com.phlourenco.arpensp.ArpenspResponse
 import com.phlourenco.cadesp.CadespRequest
+import com.phlourenco.definitions.Address
 import com.phlourenco.definitions.SivecRequest
+import com.phlourenco.definitions.SivecResponse
 import definitions.SitelResponse
 import definitions.SitelSearch
 import io.ktor.application.*
@@ -17,6 +19,7 @@ import io.ktor.http.*
 import io.ktor.gson.*
 import io.ktor.features.*
 import io.ktor.request.receive
+import org.omg.CORBA.Object
 import org.openqa.selenium.By
 import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.WebElement
@@ -26,12 +29,18 @@ import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.support.ui.Select
 import org.openqa.selenium.support.ui.WebDriverWait
+import org.openqa.selenium.remote.CapabilityType
+import org.openqa.selenium.remote.DesiredCapabilities
+
+import io.ktor.server.netty.EngineMain
+import java.awt.print.PageFormat
+import java.net.URL
 
 
-fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
+fun main(args: Array<String>): Unit = EngineMain.main(args)
 
 @Suppress("unused") // Referenced in application.conf
-@kotlin.jvm.JvmOverloads
+@JvmOverloads
 
 fun Application.module(testing: Boolean = false) {
     val dbConnection: dbConnection = dbConnection()
@@ -270,7 +279,24 @@ fun Application.module(testing: Boolean = false) {
         }
 
         get("/infocrim") {
-            val driver = ChromeDriver()
+            var driver = ChromeDriver()
+            val diretorio = System.getProperty("user.dir")+"/downloads"
+            val chromePref = HashMap<String, Any>()
+            chromePref.put("profile.default_content_settings.popups", 0)
+            chromePref.put("download.default_directory", diretorio)
+            chromePref.put("download.prompt_for_download" ,false)
+            chromePref.put("download.directory_upgrade",true)
+            chromePref.put("plugins.always_open_pdf_externally", true)
+            val options = ChromeOptions()
+            options.setExperimentalOption("prefs", chromePref)
+            options.addArguments("--kiosk-printing")
+            options.addArguments("--print-to-pdf")
+            options.addArguments("disable-popup-blocking")
+            val cap = DesiredCapabilities.chrome()
+            cap.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true)
+            cap.setCapability(ChromeOptions.CAPABILITY, options)
+
+            driver = ChromeDriver(cap)
             login(driver)
             driver.navigate().to("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/infocrim/login.html")
             waitUntilPageIsReady(driver)
@@ -304,11 +330,40 @@ fun Application.module(testing: Boolean = false) {
             driver.findElementByName("nomeusuario").sendKeys("fiap")
             driver.findElementByName("senhausuario").sendKeys("mpsp")
             driver.findElementByName("Acessar").click()
+            moveTo(driver,"Pesquisa", true)
+            moveTo(driver,"Por Réu", true)
+            val type = validateSivecSearchType(req.searchType)
+            moveTo(driver,type, true)
             waitUntilPageIsReady(driver)
-            driver.findElementById("1").click()
+            driver.findElementById(getIdTextFieldForType(req.searchType)).sendKeys(req.term)
+            driver.findElementById("procura").click()
+            waitUntilPageIsReady(driver)
+            moveTo(driver,"1.157.644",true)
+            val results = driver.findElementsByClassName("textotab")
+            val response = SivecResponse(results[8].text,
+                results[9].text,
+                results[10].text,
+                results[11].text,
+                results[14].text,
+                results[15].text,
+                results[16].text,
+                results[17].text,
+                convertToBolean(results[18].text),
+                results[20].text,
+                results[22].text,
+                results[24].text,
+                results[26].text,
+                results[27].text,
+                results[25].text,
+                results[23].text,
+                Address(results[28].text, results[29].text)
+            )
 
-
+            call.respond(response)
+            driver.close()
         }
+
+
 
         get("/") {
             call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
@@ -321,7 +376,9 @@ fun Application.module(testing: Boolean = false) {
     }
 }
 
-
+fun convertToBolean(term: String): Boolean {
+    return term == "NÃO"
+}
 
 fun moveTo(driver: ChromeDriver,name: String, click: Boolean){
     if(click){
@@ -355,4 +412,28 @@ fun waitUntilPageIsReady(driver: ChromeDriver) {
 
 fun  expandShadowRoot(parent: WebElement, driver: ChromeDriver): WebElement {
     return driver.executeScript("return arguments[0].shadowRoot", parent) as WebElement
+}
+
+fun validateSivecSearchType(searchType: String) : String {
+    if (searchType == "document") {
+        return "Por RG"
+    }
+    else if (searchType == "name") {
+        return "Por Nome"
+    }
+    else {
+        return "Matrícula SAP"
+    }
+}
+
+fun getIdTextFieldForType(searchType: String) : String {
+    if (searchType == "document") {
+        return "idValorPesq"
+    }
+    else if (searchType == "name") {
+        return "idNomePesq"
+    }
+    else {
+        return "idValorPesq"
+    }
 }
