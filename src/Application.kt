@@ -8,10 +8,13 @@ import com.phlourenco.arpensp.ArpenspRequest
 import com.phlourenco.arpensp.ArpenspResponse
 import com.phlourenco.cadesp.CadespRequest
 import com.phlourenco.definitions.Address
+import com.phlourenco.definitions.InfocrimResponse
 import com.phlourenco.definitions.SivecRequest
 import com.phlourenco.definitions.SivecResponse
 import definitions.SitelResponse
 import definitions.SitelSearch
+import id.jasoet.funpdf.HtmlToPdf
+import id.jasoet.funpdf.PageOrientation
 import io.ktor.application.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -19,11 +22,9 @@ import io.ktor.http.*
 import io.ktor.gson.*
 import io.ktor.features.*
 import io.ktor.request.receive
-import org.omg.CORBA.Object
 import org.openqa.selenium.By
 import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.WebElement
-import org.openqa.selenium.*
 import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.interactions.Actions
@@ -31,10 +32,11 @@ import org.openqa.selenium.support.ui.Select
 import org.openqa.selenium.support.ui.WebDriverWait
 import org.openqa.selenium.remote.CapabilityType
 import org.openqa.selenium.remote.DesiredCapabilities
-
 import io.ktor.server.netty.EngineMain
-import java.awt.print.PageFormat
-import java.net.URL
+import java.io.InputStream
+import java.util.*
+import kotlin.collections.HashMap
+
 
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
@@ -44,6 +46,17 @@ fun main(args: Array<String>): Unit = EngineMain.main(args)
 
 fun Application.module(testing: Boolean = false) {
     val dbConnection: dbConnection = dbConnection()
+
+    val pdf by lazy {
+        HtmlToPdf(executable = "/usr/bin/wkhtmltopdf") {
+            orientation(PageOrientation.LANDSCAPE)
+            pageSize("Letter")
+            marginTop("1in")
+            marginBottom("1in")
+            marginLeft("1in")
+            marginRight("1in")
+        }
+    }
 
     install(ContentNegotiation) {
         gson {
@@ -64,6 +77,24 @@ fun Application.module(testing: Boolean = false) {
         values.forEach {
             driver.findElementByName(it.key).sendKeys(it.value)
         }
+    }
+
+    fun stringToPdf(str: String): InputStream? {
+        return pdf.convert(input = str)
+    }
+
+    fun streamToBase64(stream: InputStream): String {
+        val bytes = stream.readBytes()
+        return Base64.getEncoder().encodeToString(bytes)
+    }
+
+    fun stringToPdfBase64(str: String): String? {
+        stringToPdf(str)?.let {
+            streamToBase64(it)?.let {
+                return it
+            }
+        }
+        return null
     }
 
     routing {
@@ -322,9 +353,13 @@ fun Application.module(testing: Boolean = false) {
                 if (!it.findElements(By.tagName("a")).isNullOrEmpty()) {
                     it.findElement(By.tagName("a")).click()
                     waitUntilPageIsReady(driver)
-                    val screenshot = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
-                    driver.executeScript(" javascript:imprime();")
-                    driver.executeScript("window.scrollBy(0,1000)");
+
+                    stringToPdfBase64(driver.pageSource)?.let {
+                        val response = InfocrimResponse(it)
+                        call.respond(response)
+                    }
+
+                    driver.close()
                     return@get
                 }
             }
