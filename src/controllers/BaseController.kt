@@ -1,5 +1,13 @@
 package com.phlourenco.controllers
 
+import com.amazonaws.AmazonServiceException
+import com.amazonaws.auth.AWSStaticCredentialsProvider
+import com.amazonaws.auth.BasicAWSCredentials
+import com.amazonaws.regions.Regions
+import com.amazonaws.services.s3.AmazonS3ClientBuilder
+import com.amazonaws.services.s3.model.CannedAccessControlList
+import com.amazonaws.services.s3.model.ObjectMetadata
+import com.amazonaws.services.s3.model.PutObjectRequest
 import com.phlourenco.Database.dbConnection
 import id.jasoet.funpdf.HtmlToPdf
 import id.jasoet.funpdf.PageOrientation
@@ -95,6 +103,24 @@ fun waitUntilPageIsReady(driver: ChromeDriver) {
 
 fun expandShadowRoot(parent: WebElement, driver: ChromeDriver): WebElement {
     return driver.executeScript("return arguments[0].shadowRoot", parent) as WebElement
+}
+
+fun uploadToS3(inputStream: InputStream): String {
+    val awsCreds = BasicAWSCredentials("AKIAIWP3B2KH5SFIODVQ", "nem79NqVWVJqsAr2KxwDX6FVZpM39LCE8GrQgyF/")
+    val awsCredentials = AWSStaticCredentialsProvider(awsCreds)
+
+    val awsS3 = AmazonS3ClientBuilder.standard().withCredentials(awsCredentials).withRegion(Regions.SA_EAST_1).build();
+
+    val metadata = ObjectMetadata()
+    metadata.contentType = "application/pdf"
+
+    val fileName = UUID.randomUUID().toString()
+    val putObjReq = PutObjectRequest("fiap-mpsp-morcegos", fileName, inputStream, metadata).withCannedAcl(
+        CannedAccessControlList.PublicRead)
+
+    awsS3.putObject(putObjReq)
+
+    return "https://fiap-mpsp-morcegos.s3.sa-east-1.amazonaws.com/$fileName"
 }
 
 fun validateSivecSearchType(searchType: String) : String {
