@@ -32,5 +32,6 @@ fun Application.module(testing: Boolean = false) {
         infocrimController()
         sivecController()
         jucespController()
+        detranCNHController()
     }
 }
