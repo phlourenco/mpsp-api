@@ -60,6 +60,11 @@ data class phone(
     val phone: String
 )
 
+data class CagedResponseCompany(
+    val company: companyResponse,
+    val detail: detailResponse
+)
+
 data class companyResponse(
     val cnpj: String,
     val name: String,
@@ -67,9 +72,9 @@ data class companyResponse(
 )
 
 data class detailResponse(
-    val subsidiaries: Int,
-    val admissions: Int,
-    val demissions: Int
+    val subsidiaries: String,
+    val admissions: String,
+    val demissions: String
 )
 
 data class identificationResponse(
