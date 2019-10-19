@@ -7,9 +7,7 @@ import com.phlourenco.cadesp.CadespResponse
 import com.phlourenco.arpensp.ArpenspRequest
 import com.phlourenco.arpensp.ArpenspResponse
 import com.phlourenco.cadesp.CadespRequest
-import com.phlourenco.definitions.Address
-import com.phlourenco.definitions.SivecRequest
-import com.phlourenco.definitions.SivecResponse
+import com.phlourenco.definitions.*
 import definitions.SitelResponse
 import definitions.SitelSearch
 import io.ktor.application.*
@@ -373,6 +371,49 @@ fun Application.module(testing: Boolean = false) {
             driver.close()
         }
 
+        post("/jucesp") {
+            val req = this.call.receive<JucespRequest>()
+            val driver = ChromeDriver()
+            login(driver)
+            driver.navigate().to("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/jucesp/index.html")
+            waitUntilPageIsReady(driver)
+            driver.findElementById("ctl00_cphContent_frmBuscaSimples_txtPalavraChave").sendKeys(req.companyName)
+            driver.findElementById("ctl00_cphContent_frmBuscaSimples_txtPalavraChave").submit()
+            waitUntilPageIsReady(driver)
+            driver.findElementByClassName("btcadastro").click()
+            moveTo(driver, "35225210133", true)
+            waitUntilPageIsReady(driver)
+            val companyName = driver.findElementById("ctl00_cphContent_frmPreVisualiza_lblEmpresa").text
+            val date = driver.findElementById("ctl00_cphContent_frmPreVisualiza_lblConstituicao").text
+            val initDate = driver.findElementById("ctl00_cphContent_frmPreVisualiza_lblAtividade").text
+            val cnpj = driver.findElementById("ctl00_cphContent_frmPreVisualiza_lblCnpj").text
+            val companyDescription = driver.findElementById("ctl00_cphContent_frmPreVisualiza_lblObjeto").text
+            val capital = driver.findElementById("ctl00_cphContent_frmPreVisualiza_lblCapital").text
+            val address = driver.findElementById("ctl00_cphContent_frmPreVisualiza_lblLogradouro").text
+            val number = driver.findElementById("ctl00_cphContent_frmPreVisualiza_lblNumero").text
+            val locale = driver.findElementById("ctl00_cphContent_frmPreVisualiza_lblBairro").text
+            val complement = driver.findElementById("ctl00_cphContent_frmPreVisualiza_lblComplemento").text
+            val postalCode = driver.findElementById("ctl00_cphContent_frmPreVisualiza_lblCep").text
+            val city = driver.findElementById("ctl00_cphContent_frmPreVisualiza_lblMunicipio").text
+
+            val response = JucespResponse(companyName,
+                date,
+                initDate,
+                cnpj,
+                companyDescription,
+                capital,
+                address,
+                number,
+                locale,
+                complement,
+                postalCode,
+                city)
+
+            call.respond(response)
+            val results = driver.findElementsByClassName("btcadastro")
+
+
+        }
 
 
         get("/") {
