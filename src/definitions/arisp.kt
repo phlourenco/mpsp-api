@@ -1,4 +1,6 @@
-package com.phlourenco.arisp
+package com.phlourenco.definitions
+
+import com.phlourenco.utils.*
 
 data class ArispRequest(
     val searchType: Int,
@@ -17,14 +19,6 @@ data class ArispRegistry(
     val registryId: String,
     val registryFileUrl: String
 )
-
-interface IIntEnum {
-    fun getValue(): Int
-}
-
-interface IStrEnum {
-    fun getTitle(): String
-}
 
 enum class SearchType: IIntEnum, IStrEnum {
     enderecoRua {

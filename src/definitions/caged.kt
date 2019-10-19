@@ -1,4 +1,4 @@
-package com.phlourenco.caged
+package com.phlourenco.definitions
 
 data class CagedRequest(
     val responsability: responsability,

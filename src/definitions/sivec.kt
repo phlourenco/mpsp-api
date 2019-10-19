@@ -1,8 +1,5 @@
 package com.phlourenco.definitions
 
-import com.phlourenco.arisp.IIntEnum
-import com.phlourenco.arisp.IStrEnum
-
 class SivecRequest(
     var term: String,
     var searchType: String

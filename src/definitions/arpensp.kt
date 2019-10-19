@@ -1,4 +1,4 @@
-package com.phlourenco.arpensp
+package com.phlourenco.definitions
 
 data class ArpenspRequest(
     val registryType: String,

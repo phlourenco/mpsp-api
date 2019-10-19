@@ -2,17 +2,9 @@ package com.phlourenco
 
 import com.google.gson.Gson
 import com.phlourenco.Database.dbConnection
-import com.phlourenco.arisp.*
-import com.phlourenco.arpensp.ArpenspRequest
-import com.phlourenco.arpensp.ArpenspResponse
-import com.phlourenco.cadesp.CadespRequest
-import com.phlourenco.cadesp.CadespResponse
 import com.phlourenco.definitions.*
 import id.jasoet.funpdf.HtmlToPdf
 import id.jasoet.funpdf.PageOrientation
-import com.phlourenco.caged.*
-import definitions.SitelResponse
-import definitions.SitelSearch
 import io.ktor.application.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -286,11 +278,12 @@ fun Application.module(testing: Boolean = false) {
             val companyCnae2 = driver.findElementById("formResumoEmpresaCaged:txtDescricaoAtividadeEconomica").text
             val companyCnaeFull = companyCnae + " - " + companyCnae2
 
-            val companyResponse: companyResponse = companyResponse(
-                companyCnpj,
-                companySocialReason,
-                companyCnaeFull
-            )
+            val companyResponse: companyResponse =
+                companyResponse(
+                    companyCnpj,
+                    companySocialReason,
+                    companyCnaeFull
+                )
 
             val subsidiaries = driver.findElementById("formResumoEmpresaCaged:txtNumFiliais").text
             val admissions = driver.findElementById("formResumoEmpresaCaged:txtTotalNumAdmissoes").text
@@ -302,10 +295,11 @@ fun Application.module(testing: Boolean = false) {
                 demissions
             )
 
-            val CagedResponseCompany: CagedResponseCompany = CagedResponseCompany(
-                companyResponse,
-                detailResponse
-            )
+            val CagedResponseCompany: CagedResponseCompany =
+                CagedResponseCompany(
+                    companyResponse,
+                    detailResponse
+                )
 
 
             call.respond(CagedResponseCompany)
