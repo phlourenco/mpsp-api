@@ -1,4 +1,4 @@
-package com.phlourenco.cadesp
+package com.phlourenco.definitions
 
 import java.util.*
 

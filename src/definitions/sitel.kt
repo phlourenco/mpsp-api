@@ -1,4 +1,4 @@
-package definitions
+package com.phlourenco.definitions
 
 class SitelSearch(var name: String,
     val motherName: String,
