@@ -1,5 +1,10 @@
 package com.phlourenco.controllers
 
+import com.amazonaws.AmazonServiceException
+import com.amazonaws.auth.AWSCredentials
+import com.amazonaws.auth.AWSCredentialsProvider
+import com.amazonaws.auth.AWSStaticCredentialsProvider
+import com.amazonaws.regions.Regions
 import com.phlourenco.definitions.*
 import io.ktor.application.call
 import io.ktor.request.receive
@@ -10,11 +15,23 @@ import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
 import java.net.URL
-import java.util.ArrayList
+import com.amazonaws.services.s3.AmazonS3Client
+import com.amazonaws.services.s3.AmazonS3ClientBuilder
+import com.amazonaws.services.s3.model.CannedAccessControlList
+import com.amazonaws.services.s3.model.ObjectMetadata
+import com.amazonaws.services.s3.model.PutObjectRequest
+import com.amazonaws.services.s3.model.Region
+import org.litote.kmongo.MongoOperator
+import java.io.File
+import java.lang.Exception
+import com.amazonaws.auth.BasicAWSCredentials
+import com.google.gson.Gson
+import java.util.*
 
 fun Route.arispController() {
 
     post("/arisp") {
+
         val req = call.receive<ArispRequest>()
 
         val options = ChromeOptions()
@@ -77,8 +94,9 @@ fun Route.arispController() {
         waitUntilPageIsReady(driver)
 
         val registries = mutableListOf<ArispRegistry>()
-        driver.findElementById("panelMatriculas").findElements(By.tagName("tr")).filter { it.isDisplayed }.forEach {
-            val td = it.findElements(By.tagName("td"))
+
+        driver.findElementById("panelMatriculas").findElements(By.tagName("tr")).filter { it.isDisplayed }.first().apply {
+            val td = this.findElements(By.tagName("td"))
             val cityName = td[0].text
             val office = td[1].text
             val registryId = td[2].text
@@ -91,19 +109,18 @@ fun Route.arispController() {
             driver.findElements(By.tagName("a")).first { it.getAttribute("href").contains(".pdf") }.apply {
                 val link = this.getAttribute("href")
                 val inputStream = URL(link).openStream()
-                val pdfBase64 = streamToBase64(inputStream)
-                val registry = ArispRegistry(cityName = cityName, office = office, registryId = registryId, registryFileUrl = pdfBase64)
+                val s3Link = uploadToS3(inputStream)
+                val registry = ArispRegistry(cityName = cityName, office = office, registryId = registryId, registryFileUrl = s3Link)
                 registries.add(registry)
-                return@forEach
             }
 
             driver.close()
             driver.switchTo().window(tabs[0])
         }
 
-        val response = ArispResponse(registries);
-        dbConnection.insert("arisp", response.toString())
-        call.respond(response)
         driver.close();
+        val response = ArispResponse(registries);
+//        dbConnection.insert("arisp", response.toString())
+        call.respond(Gson().toJson(response).toString())
     }
 }

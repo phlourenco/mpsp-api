@@ -27,9 +27,14 @@ repositories {
     mavenLocal()
     jcenter()
     maven { url 'https://kotlin.bintray.com/ktor' }
+    maven { url 'https://repo1.maven.org/maven2/' }
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
+    implementation 'com.amazonaws:aws-java-sdk-bom:1.11.656'
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.11.656'
+
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile "io.ktor:ktor-server-netty:$ktor_version"
     compile "ch.qos.logback:logback-classic:$logback_version"
