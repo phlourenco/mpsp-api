@@ -2,6 +2,7 @@ package com.phlourenco
 
 import com.phlourenco.controllers.*
 import com.phlourenco.definitions.*
+import detranVehicleController
 import io.ktor.application.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -33,5 +34,7 @@ fun Application.module(testing: Boolean = false) {
         sivecController()
         jucespController()
         detranCNHController()
+        detranTimeLineController()
+        detranVehicleController()
     }
 }

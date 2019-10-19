@@ -1,16 +1,15 @@
 package com.phlourenco.controllers
-import DetranCNHRequest
+
+import com.phlourenco.definitions.DetranTimeLineRequest
 import io.ktor.application.call
 import io.ktor.request.receive
-import io.ktor.routing.*
-import org.openqa.selenium.TakesScreenshot
+import io.ktor.routing.Route
+import io.ktor.routing.post
 import org.openqa.selenium.chrome.ChromeDriver
-import java.util.concurrent.TimeUnit
 
-
-fun Route.detranCNHController() {
-    post("/detranCNH") {
-        val req = this.call.receive<DetranCNHRequest>()
+fun Route.detranTimeLineController() {
+    post("/detranTimeLine") {
+        val req = this.call.receive<DetranTimeLineRequest>()
         val driver = ChromeDriver()
 
         login(driver)
@@ -21,9 +20,13 @@ fun Route.detranCNHController() {
         driver.findElementById("form:j_id563205015_44efc15b").click()
         waitUntilPageIsReady(driver)
         driver.findElementById("navigation_a_M_16").click()
-        moveTo(driver, "Consultar Imagem da CNH",true)
-        driver.findElementById("form:cpf").sendKeys(req.cpf)
+        moveTo(driver, "Linha da Vida do Condutor",true)
+        waitUntilPageIsReady(driver)
+        driver.findElementById("form:registro").sendKeys(req.registry)
+        driver.findElementById("form:rg").sendKeys(req.rg)
+        driver.findElementById("form:nome").sendKeys(req.conductorName)
+        driver.findElementById("form:pgu").sendKeys(req.pgu)
+        driver.findElementById("form:j_id2049423534_c43225e_focus").sendKeys(req.uf)
         moveTo(driver,"Pesquisar",true)
-
     }
 }
