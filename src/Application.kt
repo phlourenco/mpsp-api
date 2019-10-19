@@ -25,9 +25,10 @@ import org.openqa.selenium.remote.CapabilityType
 import org.openqa.selenium.remote.DesiredCapabilities
 import io.ktor.server.netty.EngineMain
 import java.io.InputStream
+import java.net.URL
 import java.util.*
 import kotlin.collections.HashMap
-
+import java.util.ArrayList
 
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
@@ -153,10 +154,26 @@ fun Application.module(testing: Boolean = false) {
             val registries = mutableListOf<ArispRegistry>()
             driver.findElementById("panelMatriculas").findElements(By.tagName("tr")).filter { it.isDisplayed }.forEach {
                 val td = it.findElements(By.tagName("td"))
-                val pdfLink = td[3].findElements(By.tagName("a")).first().getAttribute("href")
-                val registry = ArispRegistry(cityName = td[0].text, office = td[1].text, registryId = td[2].text, registryFileUrl = pdfLink)
-                registries.add(registry)
-//                driver.executeScript("javascript:VisualizarMatricula(10,30098);")
+                val cityName = td[0].text
+                val office = td[1].text
+                val registryId = td[2].text
+
+                td[3].findElements(By.tagName("a")).first().click()
+
+                val tabs = ArrayList(driver.windowHandles)
+                driver.switchTo().window(tabs[1])
+
+                driver.findElements(By.tagName("a")).first { it.getAttribute("href").contains(".pdf") }.apply {
+                    val link = this.getAttribute("href")
+                    val inputStream = URL(link).openStream()
+                    val pdfBase64 = streamToBase64(inputStream)
+                    val registry = ArispRegistry(cityName = cityName, office = office, registryId = registryId, registryFileUrl = pdfBase64)
+                    registries.add(registry)
+                    return@forEach
+                }
+
+                driver.close()
+                driver.switchTo().window(tabs[0])
             }
 
             val response = ArispResponse(registries);
