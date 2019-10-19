@@ -41,5 +41,6 @@ dependencies {
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'org.litote.kmongo:kmongo:3.9.0'
     compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '2.41.0'
+    compile 'id.jasoet:fun-pdf:1.0.3'
 }
 
