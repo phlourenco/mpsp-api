@@ -8,3 +8,4 @@ class DetranTimeLineRequest(
     val uf: String
 )
 
+class DetranTimeLineResponse(val registryFileUrl: String)

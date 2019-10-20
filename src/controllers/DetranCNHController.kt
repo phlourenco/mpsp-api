@@ -1,7 +1,9 @@
 package com.phlourenco.controllers
+import DetranCHNResponse
 import DetranCNHRequest
 import io.ktor.application.call
 import io.ktor.request.receive
+import io.ktor.response.respond
 import io.ktor.routing.*
 import org.openqa.selenium.TakesScreenshot
 import org.openqa.selenium.chrome.ChromeDriver
@@ -24,6 +26,23 @@ fun Route.detranCNHController() {
         moveTo(driver, "Consultar Imagem da CNH",true)
         driver.findElementById("form:cpf").sendKeys(req.cpf)
         moveTo(driver,"Pesquisar",true)
+        val tabs = ArrayList(driver.windowHandles)
+        driver.switchTo().window(tabs[1])
+        val results = driver.findElementsByClassName("bold")
+        val response = DetranCHNResponse(driver.findElementById("form:imgFoto").getAttribute("src"),
+            results[1].text,
+            results[2].text,
+            results[3].text,
+            results[4].text,
+            results[5].text,
+            results[6].text,
+            results[7].text,
+            results[8].text,
+            results[9].text,
+            results[10].text,
+            results[11].text)
 
+        call.respond(response)
+        driver.close()
     }
 }

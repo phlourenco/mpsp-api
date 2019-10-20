@@ -1,11 +1,15 @@
 package com.phlourenco.controllers
 
 import com.phlourenco.definitions.DetranTimeLineRequest
+import com.phlourenco.definitions.DetranTimeLineResponse
 import io.ktor.application.call
 import io.ktor.request.receive
+import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.post
+import org.openqa.selenium.By
 import org.openqa.selenium.chrome.ChromeDriver
+import java.net.URL
 
 fun Route.detranTimeLineController() {
     post("/detranTimeLine") {
@@ -27,6 +31,12 @@ fun Route.detranTimeLineController() {
         driver.findElementById("form:nome").sendKeys(req.conductorName)
         driver.findElementById("form:pgu").sendKeys(req.pgu)
         driver.findElementById("form:j_id2049423534_c43225e_focus").sendKeys(req.uf)
-        moveTo(driver,"Pesquisar",true)
+        driver.findElements(By.tagName("a")).first { it.getAttribute("href").contains(".pdf") }.apply {
+            val link = this.getAttribute("href")
+            val inputStream = URL(link).openStream()
+            val s3Link = uploadToS3(inputStream)
+            val response = DetranTimeLineResponse(s3Link)
+            call.respond(response)
+        }
     }
 }
