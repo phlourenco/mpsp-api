@@ -7,7 +7,9 @@ import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.post
+import org.openqa.selenium.By
 import org.openqa.selenium.chrome.ChromeDriver
+import java.net.URL
 
 fun Route.jucespController() {
 
@@ -36,20 +38,26 @@ fun Route.jucespController() {
         val postalCode = driver.findElementById("ctl00_cphContent_frmPreVisualiza_lblCep").text
         val city = driver.findElementById("ctl00_cphContent_frmPreVisualiza_lblMunicipio").text
 
-        val response = JucespResponse(companyName,
-            date,
-            initDate,
-            cnpj,
-            companyDescription,
-            capital,
-            address,
-            number,
-            locale,
-            complement,
-            postalCode,
-            city)
+        driver.findElementsByClassName("btcadastro").first { it.getAttribute("onclick").contains(".pdf") }.apply {
+            var link = this.getAttribute("onclick")
+            link =  "http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/jucesp/" + link.substringAfter("'").substringBefore("'")
+            val inputStream = URL(link).openStream()
+            val s3Link = uploadToS3(inputStream)
+            val response = JucespResponse(companyName,
+                date,
+                initDate,
+                cnpj,
+                companyDescription,
+                capital,
+                address,
+                number,
+                locale,
+                complement,
+                postalCode,
+                city,
+                s3Link)
 
-        call.respond(response)
-        val results = driver.findElementsByClassName("btcadastro")
+            call.respond(response)
+        }
     }
 }

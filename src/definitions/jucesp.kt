@@ -13,4 +13,5 @@ class JucespResponse(val companyType: String,
                      val locale: String,
                      val complement: String,
                      val postalCode: String,
-                     val city: String)
+                     val city: String,
+                     val registryFileUrl: String)
