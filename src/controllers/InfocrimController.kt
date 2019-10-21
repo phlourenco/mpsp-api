@@ -1,7 +1,9 @@
 package com.phlourenco.controllers
 
+import com.phlourenco.definitions.InfocrimRequest
 import com.phlourenco.definitions.InfocrimResponse
 import io.ktor.application.call
+import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.*
 import org.openqa.selenium.By
@@ -13,6 +15,7 @@ import org.openqa.selenium.remote.DesiredCapabilities
 fun Route.infocrimController() {
 
     post("/infocrim") {
+        val req = this.call.receive<InfocrimRequest>()
         var driver = ChromeDriver()
         val diretorio = System.getProperty("user.dir")+"/downloads"
         val chromePref = HashMap<String, Any>()
@@ -40,6 +43,12 @@ fun Route.infocrimController() {
         driver.findElementByName("cd_senha").findElement(By.xpath("./..")).findElement(By.xpath("./..")).findElements(
             By.tagName("td")).last().findElements(By.tagName("a")).first().click()
         waitUntilPageIsReady(driver)
+
+        val select = driver.findElementByName("inst")
+        select.findElements(By.tagName("option")).first { it.getAttribute("value") == req.institution.toString() }.apply {
+            select.sendKeys(this.text)
+        }
+
         driver.findElementById("enviar").click()
         waitUntilPageIsReady(driver)
 
@@ -51,11 +60,10 @@ fun Route.infocrimController() {
                 stringToPdf(driver.pageSource)?.let {
                     val pdfUrl = uploadToS3(it)
                     val response = InfocrimResponse(pdfUrl)
+                    driver.close()
                     call.respond(response)
                 }
-
-                driver.close()
-                return@post
+//                return@post
             }
         }
     }
