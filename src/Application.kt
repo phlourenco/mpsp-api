@@ -24,7 +24,9 @@ fun Application.module(testing: Boolean = false) {
     routing {
         arispController() //falta pdf
         cadespController()
-        cagedController()
+        cagedResponsibleController()
+        cagedCompanyController()
+        cagedWorkerController()
         sielController()
         arpenspController()
         infocrimController()

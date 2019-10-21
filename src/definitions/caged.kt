@@ -1,37 +1,23 @@
 package com.phlourenco.definitions
 
-data class CagedRequest(
-    val responsability: responsability,
-    val company: company,
-    val establishment: establishment,
-    val worker: worker
-)
+// Caged Responsible
 
-data class responsability(
-    val searchType: String,
+data class CagedResponsibleRequest(
+    val searchType: Int,
     val term: String
 )
-
-data class company(
-    val cnpj: String
+data class CagedResponsibleResponse(
+    val identification: CagedResponsibleIdentification,
+    val address: CagedResponsibleAddress,
+    val contact: CagedResponsibleContact
 )
 
-data class establishment(
-    val searchType: String,
-    val term: String
-)
-
-data class worker(
-    val searchType: String,
-    val term: String
-)
-
-data class identification(
+data class CagedResponsibleIdentification(
     val cnpjCeiCpf: String,
     val name: String
 )
 
-data class address(
+data class CagedResponsibleAddress(
     val street: String,
     val neighborhood: String,
     val city: String,
@@ -39,51 +25,40 @@ data class address(
     val cep: String
 )
 
-data class CagedResponseResponsible(
-    val identification: identification,
-    val address: address,
-    val contact: contact
-)
-
-
-
-data class contact(
+data class CagedResponsibleContact(
     val name: String,
     val cpf: String,
-    val phone: phone,
+    val phone: String,
     val line: String,
     val email: String
 )
 
-data class phone(
-    val ddd: String,
-    val phone: String
+// Caged Company
+
+data class CagedCompanyRequest(
+    val cnpj: String
 )
 
-data class CagedResponseCompany(
-    val company: companyResponse,
-    val detail: detailResponse
-)
-
-data class companyResponse(
+data class CagedCompanyResponse(
     val cnpj: String,
     val name: String,
-    val cnae: String
-)
-
-data class detailResponse(
+    val cnae: String,
     val subsidiaries: String,
     val admissions: String,
     val demissions: String
 )
 
-data class identificationResponse(
-    val name: String,
-    val pis: String,
-    val convertedPis: String
+// Caged Worker
+
+data class CagedWorkerRequest(
+    val searchType: Int,
+    val term: String
 )
 
-data class sumaryResponse(
+data class CagedWorkerResponse(
+    val name: String,
+    val pis: String,
+    val convertedPis: String,
     val cpf: String,
     val birthDate: String,
     val ctpsSerie: String,
@@ -92,5 +67,6 @@ data class sumaryResponse(
     val nationality: String,
     val color: String,
     val study: String,
-    val hasDisability: Boolean
+    val hasDisability: Boolean,
+    val pdfUrl: String
 )
