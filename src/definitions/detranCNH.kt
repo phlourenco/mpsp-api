@@ -1,7 +1,7 @@
 
 class DetranCNHRequest(val cpf: String)
 
-class DetranCHNResponse(val imagePath: String,
+class DetranCHNResponse(val imageUrl: String,
                         val renach: String,
                         val category: String,
                         val emission: String,
@@ -10,6 +10,6 @@ class DetranCHNResponse(val imagePath: String,
                         val fatherName: String,
                         val motherName: String,
                         val registerDate: String,
-                        val tipografico: String,
+                        val typographic: String,
                         val identification: String,
                         val cpf : String)
