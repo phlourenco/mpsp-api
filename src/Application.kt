@@ -15,6 +15,10 @@ fun main(args: Array<String>): Unit = EngineMain.main(args)
 @JvmOverloads
 
 fun Application.module(testing: Boolean = false) {
+    install(CORS)
+    {
+        anyHost()
+    }
 
     install(ContentNegotiation) {
         gson {
