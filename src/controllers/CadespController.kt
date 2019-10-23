@@ -1,6 +1,5 @@
 package com.phlourenco.controllers
 
-import com.phlourenco.*
 import com.phlourenco.definitions.CadespRequest
 import com.phlourenco.definitions.CadespResponse
 import io.ktor.application.call
@@ -63,7 +62,7 @@ fun Route.cadespController() {
         val response: CadespResponse = CadespResponse(ie, cnpj, businessName, drt, situation, dateStateRegistration, stateRegime, taxOffice, fantasyName, nire, registrationSituation, taxOccurrence, unitType, ieStartDate, dateStartedSituation, practices);
 
         call.respond(response)
-        dbConnection.insert("cadesp", response.toString())
+        DatabaseService.insert("cadesp", response.toString())
         driver.close()
     }
 }

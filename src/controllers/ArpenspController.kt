@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.phlourenco.definitions.ArpenspRequest
 import com.phlourenco.definitions.ArpenspResponse
 import io.ktor.application.call
+import io.ktor.request.header
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.Route
@@ -52,10 +53,10 @@ fun Route.arpenspController() {
 
         driver.close()
 
-        val gson = Gson()
-        val objJson = gson.toJson(response)
+        call.request.header("reportId")?.apply {
+            DatabaseService.insert(this, Gson().toJson(response).toString())
+        }
 
-        dbConnection.insert("Arpensp", objJson.toString())
         call.respond(response)
     }
 }

@@ -47,7 +47,7 @@ fun Route.sielController() {
                 td[23].text
             )
 
-            dbConnection.insert("siel", response.toString())
+            DatabaseService.insert("siel", response.toString())
             call.respond(response)
         }
 

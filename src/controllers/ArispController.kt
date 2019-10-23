@@ -1,10 +1,5 @@
 package com.phlourenco.controllers
 
-import com.amazonaws.AmazonServiceException
-import com.amazonaws.auth.AWSCredentials
-import com.amazonaws.auth.AWSCredentialsProvider
-import com.amazonaws.auth.AWSStaticCredentialsProvider
-import com.amazonaws.regions.Regions
 import com.phlourenco.definitions.*
 import io.ktor.application.call
 import io.ktor.request.receive
@@ -15,17 +10,10 @@ import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
 import java.net.URL
-import com.amazonaws.services.s3.AmazonS3Client
-import com.amazonaws.services.s3.AmazonS3ClientBuilder
-import com.amazonaws.services.s3.model.CannedAccessControlList
-import com.amazonaws.services.s3.model.ObjectMetadata
-import com.amazonaws.services.s3.model.PutObjectRequest
-import com.amazonaws.services.s3.model.Region
-import org.litote.kmongo.MongoOperator
-import java.io.File
-import java.lang.Exception
-import com.amazonaws.auth.BasicAWSCredentials
 import com.google.gson.Gson
+import com.google.gson.JsonObject
+import io.ktor.request.header
+import org.json.JSONObject
 import java.util.*
 
 fun Route.arispController() {
@@ -120,7 +108,12 @@ fun Route.arispController() {
 
         driver.close();
         val response = ArispResponse(registries);
-//        dbConnection.insert("arisp", response.toString())
-        call.respond(Gson().toJson(response).toString())
+
+        call.request.header("reportId")?.apply {
+            val report = Report(this, Gson().fromJson(Gson()..))
+            DatabaseService.insert("arisp", Gson().toJson(report).toString())
+        }
+
+        call.respond(response)
     }
 }

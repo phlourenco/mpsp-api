@@ -1,6 +1,5 @@
 package com.phlourenco.controllers
 
-import com.amazonaws.AmazonServiceException
 import com.amazonaws.auth.AWSStaticCredentialsProvider
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.regions.Regions
@@ -8,7 +7,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.amazonaws.services.s3.model.CannedAccessControlList
 import com.amazonaws.services.s3.model.ObjectMetadata
 import com.amazonaws.services.s3.model.PutObjectRequest
-import com.phlourenco.Database.dbConnection
+import com.phlourenco.Database.DatabaseService
 import id.jasoet.funpdf.HtmlToPdf
 import id.jasoet.funpdf.PageOrientation
 import org.openqa.selenium.By
@@ -21,7 +20,7 @@ import org.openqa.selenium.support.ui.WebDriverWait
 import java.io.InputStream
 import java.util.*
 
-val dbConnection: dbConnection = dbConnection()
+val DatabaseService: DatabaseService = DatabaseService()
 
 val pdf by lazy {
     HtmlToPdf(executable = "/usr/bin/wkhtmltopdf") {
