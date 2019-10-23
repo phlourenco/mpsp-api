@@ -18,6 +18,6 @@ data class FullReport(
     val detranTimeLine: DetranTimeLineResponse?,
     val detranVehicle: DetranVehicleResponse?,
     val infocrim: InfocrimResponse?,
-    val siel: SitelResponse?,
+    val siel: SielResponse?,
     val sivec: SivecResponse?
 )

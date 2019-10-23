@@ -1,8 +1,8 @@
 package com.phlourenco.controllers
 
 import com.google.gson.Gson
-import com.phlourenco.definitions.SitelResponse
-import com.phlourenco.definitions.SitelSearch
+import com.phlourenco.definitions.SielResponse
+import com.phlourenco.definitions.SielSearch
 import io.ktor.application.call
 import io.ktor.request.header
 import io.ktor.request.receive
@@ -15,7 +15,7 @@ import org.openqa.selenium.chrome.ChromeDriver
 fun Route.sielController() {
 
     post("/siel") {
-        val req = call.receive<SitelSearch>()
+        val req = call.receive<SielSearch>()
         val driver = ChromeDriver()
         login(driver)
 
@@ -34,7 +34,7 @@ fun Route.sielController() {
         driver.findElements(By.tagName("table")).filter { it.isDisplayed }.forEach {
             val td = it.findElements(By.tagName("td"))
 
-            val response = SitelResponse(
+            val response = SielResponse(
                 td[1].text,
                 td[3].text,
                 td[5].text,

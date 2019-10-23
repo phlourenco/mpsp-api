@@ -76,7 +76,7 @@ fun Route.reportController() {
         val detranVehicleReports = getReports<DetranVehicleResponse>("detranVehicle")
         val infocrimReports = getReports<InfocrimResponse>("infocrim")
         val jucespReports = getReports<JucespResponse>("jucesp")
-        val sielReports = getReports<SitelResponse>("siel")
+        val sielReports = getReports<SielResponse>("siel")
         val sivecReports = getReports<SivecResponse>("sivec")
 
         val servicesReports = listOf(arispReports, arpenspReports, cadespReports, cagedCompanyReports, cagedResponsibleReports,
