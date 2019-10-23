@@ -1,9 +1,10 @@
 package com.phlourenco.controllers
 
-import com.phlourenco.*
+import com.google.gson.Gson
 import com.phlourenco.definitions.CadespRequest
 import com.phlourenco.definitions.CadespResponse
 import io.ktor.application.call
+import io.ktor.request.header
 import io.ktor.response.respond
 import io.ktor.routing.*
 import org.openqa.selenium.chrome.ChromeDriver
@@ -62,9 +63,15 @@ fun Route.cadespController() {
         val practices = td[29].text
         val response: CadespResponse = CadespResponse(ie, cnpj, businessName, drt, situation, dateStateRegistration, stateRegime, taxOffice, fantasyName, nire, registrationSituation, taxOccurrence, unitType, ieStartDate, dateStartedSituation, practices);
 
-        call.respond(response)
-        dbConnection.insert("cadesp", response.toString())
         driver.close()
+
+        call.request.header("reportId")?.apply {
+            val responseMap = response.serializeToMap().toMutableMap()
+            responseMap["reportId"] = this
+            DatabaseService.insert("cadesp", Gson().toJson(responseMap).toString())
+        }
+
+        call.respond(response)
     }
 }
 

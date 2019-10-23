@@ -1,9 +1,11 @@
 package com.phlourenco.controllers
 
+import com.google.gson.Gson
 import com.phlourenco.definitions.Address
 import com.phlourenco.definitions.SivecRequest
 import com.phlourenco.definitions.SivecResponse
 import io.ktor.application.call
+import io.ktor.request.header
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.Route
@@ -49,7 +51,14 @@ fun Route.sivecController() {
             Address(results[28].text, results[29].text)
         )
 
-        call.respond(response)
         driver.close()
+
+        call.request.header("reportId")?.apply {
+            val responseMap = response.serializeToMap().toMutableMap()
+            responseMap["reportId"] = this
+            DatabaseService.insert("sivec", Gson().toJson(responseMap).toString())
+        }
+
+        call.respond(response)
     }
 }

@@ -1,8 +1,10 @@
 package com.phlourenco.controllers
 
+import com.google.gson.Gson
 import com.phlourenco.definitions.InfocrimRequest
 import com.phlourenco.definitions.InfocrimResponse
 import io.ktor.application.call
+import io.ktor.request.header
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.*
@@ -61,6 +63,14 @@ fun Route.infocrimController() {
                     val pdfUrl = uploadToS3(it)
                     val response = InfocrimResponse(pdfUrl)
                     driver.close()
+
+
+                    call.request.header("reportId")?.apply {
+                        val responseMap = response.serializeToMap().toMutableMap()
+                        responseMap["reportId"] = this
+                        DatabaseService.insert("infocrim", Gson().toJson(responseMap).toString())
+                    }
+
                     call.respond(response)
                 }
 //                return@post

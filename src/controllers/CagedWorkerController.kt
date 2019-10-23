@@ -1,7 +1,9 @@
 package com.phlourenco.controllers
 
+import com.google.gson.Gson
 import com.phlourenco.definitions.*
 import io.ktor.application.call
+import io.ktor.request.header
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.Route
@@ -70,6 +72,12 @@ fun Route.cagedWorkerController() {
         val response = CagedWorkerResponse(name, pis, pisConverted, cpf, birthDate, ctpsSerie, pisSituation, sex, nationality, color, study, hasDisability, pdfLink)
 
         driver.close()
+
+        call.request.header("reportId")?.apply {
+            val responseMap = response.serializeToMap().toMutableMap()
+            responseMap["reportId"] = this
+            DatabaseService.insert("cagedWorker", Gson().toJson(responseMap).toString())
+        }
         call.respond(response)
     }
 }

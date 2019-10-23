@@ -40,5 +40,6 @@ fun Application.module(testing: Boolean = false) {
         detranTimeLineController()
         detranVehicleController()
         censecController()
+        reportController()
     }
 }

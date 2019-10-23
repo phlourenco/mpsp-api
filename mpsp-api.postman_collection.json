@@ -1,0 +1,400 @@
+{
+	"info": {
+		"_postman_id": "d650ba9d-5a99-4801-bf4b-0799637b9358",
+		"name": "mpsp-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "SIEL",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Paulo\",\n  \"motherName\": \"Marlene\",\n  \"birthDate\": \"10/02/1994\",\n  \"documentNumber\": \"123456789012\",\n  \"processNumber\": \"3232132131321\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/siel",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"siel"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ARISP",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"searchType\": 6,\n\t\"personType\": 1,\n\t\"cityNames\": [\"ADAMANTINA\", \"SÃO PAULO - CAPITAL\"],\n\t\"cpfCnpj\": \"12019797658\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/arisp",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"arisp"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ARPENSP",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"registryType\": \"MARRIAGE\",\n    \"processNumber\": \"123456789\",\n    \"place\": 297\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/arpensp",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"arpensp"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CADESP",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/cadesp",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"cadesp"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Caged (trabalhador)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"searchType\": 1,\n\t\"term\": \"12019797658\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/cagedWorker",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"cagedWorker"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Caged (empresa)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"cnpj\": \"12123213123123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/cagedCompany",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"cagedCompany"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Caged (responsavel)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"searchType\": 1,\n\t\"term\": \"12019797658\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/cagedResponsible",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"cagedResponsible"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "INFOCRIM",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"institution\": \"3\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/infocrim",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"infocrim"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CENSEC",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"cpfCnpj\": \"12019797658\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/censec",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"censec"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Detran CNH",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"cpf\": \"12019797658\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/detranCNH",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"detranCNH"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Detran Timeline",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"registry\": \"123\",\n\t\"rg\": \"234567\",\n\t\"conductorName\": \"Fulano da Silva\",\n\t\"pgu\": \"123\",\n\t\"uf\": \"SP\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/detranTimeLine",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"detranTimeLine"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Detran Vehicle",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"board\": \"opa\",\n\t\"document\": \"123565\",\n\t\"renavam\": \"9876\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/detranVehicle",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"detranVehicle"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

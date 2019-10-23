@@ -1,13 +1,12 @@
 package com.phlourenco.controllers
-import DetranCHNResponse
-import DetranCNHRequest
+import com.google.gson.Gson
+import com.phlourenco.definitions.*
 import io.ktor.application.call
+import io.ktor.request.header
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.*
-import org.openqa.selenium.TakesScreenshot
 import org.openqa.selenium.chrome.ChromeDriver
-import java.util.concurrent.TimeUnit
 
 
 fun Route.detranCNHController() {
@@ -29,7 +28,7 @@ fun Route.detranCNHController() {
         val tabs = ArrayList(driver.windowHandles)
         driver.switchTo().window(tabs[1])
         val results = driver.findElementsByClassName("bold")
-        val response = DetranCHNResponse(driver.findElementById("form:imgFoto").getAttribute("src"),
+        val response = DetranCNHResponse(driver.findElementById("form:imgFoto").getAttribute("src"),
             results[1].text,
             results[2].text,
             results[3].text,
@@ -42,7 +41,14 @@ fun Route.detranCNHController() {
             results[10].text,
             results[11].text)
 
-        call.respond(response)
         driver.close()
+
+        call.request.header("reportId")?.apply {
+            val responseMap = response.serializeToMap().toMutableMap()
+            responseMap["reportId"] = this
+            DatabaseService.insert("detranCNH", Gson().toJson(responseMap).toString())
+        }
+
+        call.respond(response)
     }
 }

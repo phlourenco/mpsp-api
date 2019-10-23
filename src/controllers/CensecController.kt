@@ -1,8 +1,10 @@
 package com.phlourenco.controllers
+import com.google.gson.Gson
 import com.phlourenco.definitions.CensecPart
 import com.phlourenco.definitions.CensecRequest
 import com.phlourenco.definitions.CensecResponse
 import io.ktor.application.call
+import io.ktor.request.header
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.*
@@ -80,6 +82,12 @@ fun Route.censecController() {
         )
 
         driver.close()
+
+        call.request.header("reportId")?.apply {
+            val responseMap = response.serializeToMap().toMutableMap()
+            responseMap["reportId"] = this
+            DatabaseService.insert("censec", Gson().toJson(responseMap).toString())
+        }
 
         call.respond(response)
     }

@@ -1,8 +1,10 @@
 package com.phlourenco.controllers
 
+import com.google.gson.Gson
 import com.phlourenco.definitions.JucespRequest
 import com.phlourenco.definitions.JucespResponse
 import io.ktor.application.call
+import io.ktor.request.header
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.Route
@@ -56,6 +58,14 @@ fun Route.jucespController() {
                 postalCode,
                 city,
                 s3Link)
+
+            driver.close()
+
+            call.request.header("reportId")?.apply {
+                val responseMap = response.serializeToMap().toMutableMap()
+                responseMap["reportId"] = this
+                DatabaseService.insert("jucesp", Gson().toJson(responseMap).toString())
+            }
 
             call.respond(response)
         }
