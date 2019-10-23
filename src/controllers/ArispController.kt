@@ -110,8 +110,9 @@ fun Route.arispController() {
         val response = ArispResponse(registries);
 
         call.request.header("reportId")?.apply {
-            val report = Report(this, Gson().fromJson(Gson()..))
-            DatabaseService.insert("arisp", Gson().toJson(report).toString())
+            val responseMap = response.serializeToMap().toMutableMap()
+            responseMap["reportId"] = this
+            DatabaseService.insert("arisp", Gson().toJson(responseMap).toString())
         }
 
         call.respond(response)

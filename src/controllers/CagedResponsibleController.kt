@@ -1,7 +1,9 @@
 package com.phlourenco.controllers
 
+import com.google.gson.Gson
 import com.phlourenco.definitions.*
 import io.ktor.application.call
+import io.ktor.request.header
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.*
@@ -51,13 +53,19 @@ fun Route.cagedResponsibleController() {
         val contactDdd = driver.findElementById("txt21_ddd020").text
         val contactPhone = driver.findElementById("txt9_telefone020").text
 
-        val responseResponsible = CagedResponsibleResponse(
+        val response = CagedResponsibleResponse(
             CagedResponsibleIdentification(cnpjCeiCpf,identificationName),
             CagedResponsibleAddress(addressStreet,addressNeighBorHood,addressCity,addressState,addressCep),
             CagedResponsibleContact(contactName, contactCpf, "${contactDdd}${contactPhone}", contactLine, contactEmail)
         )
 
         driver.close()
-        call.respond(responseResponsible)
+
+        call.request.header("reportId")?.apply {
+            val responseMap = response.serializeToMap().toMutableMap()
+            responseMap["reportId"] = this
+            DatabaseService.insert("cagedResponsible", Gson().toJson(responseMap).toString())
+        }
+        call.respond(response)
     }
 }

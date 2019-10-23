@@ -1,12 +1,11 @@
-import com.phlourenco.controllers.login
-import com.phlourenco.controllers.moveTo
-import com.phlourenco.controllers.uploadToS3
-import com.phlourenco.controllers.waitUntilPageIsReady
+import com.google.gson.Gson
+import com.phlourenco.controllers.*
 import com.phlourenco.definitions.DetranTimeLineRequest
 import com.phlourenco.definitions.DetranTimeLineResponse
 import com.phlourenco.definitions.DetranVehicleRequest
 import com.phlourenco.definitions.DetranVehicleResponse
 import io.ktor.application.call
+import io.ktor.request.header
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.Route
@@ -37,6 +36,15 @@ fun Route.detranVehicleController() {
             val inputStream = URL(link).openStream()
             val s3Link = uploadToS3(inputStream)
             val response = DetranVehicleResponse(s3Link)
+            driver.close()
+
+
+            call.request.header("reportId")?.apply {
+                val responseMap = response.serializeToMap().toMutableMap()
+                responseMap["reportId"] = this
+                DatabaseService.insert("detranVehicle", Gson().toJson(responseMap).toString())
+            }
+
             call.respond(response)
         }
     }

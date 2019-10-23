@@ -1,7 +1,8 @@
+package com.phlourenco.definitions
 
 class DetranCNHRequest(val cpf: String)
 
-class DetranCHNResponse(val imageUrl: String,
+class DetranCNHResponse(val imageUrl: String,
                         val renach: String,
                         val category: String,
                         val emission: String,

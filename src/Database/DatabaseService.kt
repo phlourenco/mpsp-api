@@ -8,7 +8,8 @@ import org.litote.kmongo.KMongo
 import org.litote.kmongo.insertOne
 
 class DatabaseService {
-    private val uri = MongoClientURI("mongodb://admin:Fiap#1418@ds133094.mlab.com:33094/mpsp-official")
+//    private val uri = MongoClientURI("mongodb://admin:Fiap#1418@ds133094.mlab.com:33094/mpsp-official")
+    private val uri = MongoClientURI("mongodb+srv://phlourenco:Z0uz2nGmBpB59neh@fiap-morcegos-rytvg.mongodb.net/mpsp?retryWrites=true&w=majority")
 
     val database = KMongo.createClient(uri = uri).getDatabase(uri.database)
 

@@ -54,7 +54,9 @@ fun Route.arpenspController() {
         driver.close()
 
         call.request.header("reportId")?.apply {
-            DatabaseService.insert(this, Gson().toJson(response).toString())
+            val responseMap = response.serializeToMap().toMutableMap()
+            responseMap["reportId"] = this
+            DatabaseService.insert("arpensp", Gson().toJson(responseMap).toString())
         }
 
         call.respond(response)

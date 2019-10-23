@@ -1,8 +1,10 @@
 package com.phlourenco.controllers
 
+import com.google.gson.Gson
 import com.phlourenco.definitions.SitelResponse
 import com.phlourenco.definitions.SitelSearch
 import io.ktor.application.call
+import io.ktor.request.header
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.Route
@@ -47,7 +49,14 @@ fun Route.sielController() {
                 td[23].text
             )
 
-            DatabaseService.insert("siel", response.toString())
+            driver.close()
+
+            call.request.header("reportId")?.apply {
+                val responseMap = response.serializeToMap().toMutableMap()
+                responseMap["reportId"] = this
+                DatabaseService.insert("siel", Gson().toJson(responseMap).toString())
+            }
+
             call.respond(response)
         }
 
