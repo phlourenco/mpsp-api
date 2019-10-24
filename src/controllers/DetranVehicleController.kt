@@ -1,7 +1,5 @@
 import com.google.gson.Gson
 import com.phlourenco.controllers.*
-import com.phlourenco.definitions.DetranTimeLineRequest
-import com.phlourenco.definitions.DetranTimeLineResponse
 import com.phlourenco.definitions.DetranVehicleRequest
 import com.phlourenco.definitions.DetranVehicleResponse
 import io.ktor.application.call

@@ -1,7 +1,6 @@
 package com.phlourenco.Database
 
 import com.mongodb.MongoClientURI
-import org.apache.xpath.operations.Bool
 import org.bson.Document
 import org.bson.types.ObjectId
 import org.litote.kmongo.KMongo

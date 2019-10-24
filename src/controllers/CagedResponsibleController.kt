@@ -8,7 +8,6 @@ import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.*
 import org.openqa.selenium.By
-import org.openqa.selenium.Keys
 import org.openqa.selenium.chrome.ChromeDriver
 
 fun Route.cagedResponsibleController() {

@@ -9,7 +9,6 @@ import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.post
-import org.openqa.selenium.By
 import org.openqa.selenium.chrome.ChromeDriver
 import java.net.URL
 

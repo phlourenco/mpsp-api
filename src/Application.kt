@@ -1,7 +1,6 @@
 package com.phlourenco
 
 import com.phlourenco.controllers.*
-import com.phlourenco.definitions.*
 import detranVehicleController
 import io.ktor.application.*
 import io.ktor.routing.*
