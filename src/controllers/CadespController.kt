@@ -23,7 +23,7 @@ fun Route.cadespController() {
         driver.navigate().to("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/cadesp/login.html")
         inputElementById(driver, "ctl00_conteudoPaginaPlaceHolder_loginControl_UserName", "12345")
         inputElementById(driver, "ctl00_conteudoPaginaPlaceHolder_loginControl_Password", "12345")
-        clickElementById(driver, "ctl00_conteudoPaginaPlacPaeHolder_loginControl_loginButton")
+        clickElementById(driver, "ctl00_conteudoPaginaPlaceHolder_loginControl_loginButton")
         waitUntilPageIsReady(driver)
         moveTo(driver, "Consultas",false)
         moveTo(driver, "Cadastro", true)
