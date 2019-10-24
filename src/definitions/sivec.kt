@@ -1,8 +1,7 @@
 package com.phlourenco.definitions
 
 class SivecRequest(
-    var term: String,
-    var searchType: String
+    var name: String
 )
 
 data class Address (

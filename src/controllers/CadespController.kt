@@ -1,27 +1,29 @@
 package com.phlourenco.controllers
 
 import com.google.gson.Gson
+import com.phlourenco.definitions.ArpenspRequest
 import com.phlourenco.definitions.CadespRequest
 import com.phlourenco.definitions.CadespResponse
 import io.ktor.application.call
 import io.ktor.request.header
+import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.*
 import org.openqa.selenium.chrome.ChromeDriver
 
 
 fun Route.cadespController() {
-    get("/cadesp/{cnpj}") {
+    post("/cadesp") {
 
         val driver = ChromeDriver()
 
-        val cadespRequest: CadespRequest = CadespRequest(call.parameters["cnpj"]!!)
+        val cadespRequest: CadespRequest = call.receive<CadespRequest>()
 
         login(driver)
         driver.navigate().to("http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/cadesp/login.html")
         inputElementById(driver, "ctl00_conteudoPaginaPlaceHolder_loginControl_UserName", "12345")
         inputElementById(driver, "ctl00_conteudoPaginaPlaceHolder_loginControl_Password", "12345")
-        clickElementById(driver, "ctl00_conteudoPaginaPlaceHolder_loginControl_loginButton")
+        clickElementById(driver, "ctl00_conteudoPaginaPlacPaeHolder_loginControl_loginButton")
         waitUntilPageIsReady(driver)
         moveTo(driver, "Consultas",false)
         moveTo(driver, "Cadastro", true)
