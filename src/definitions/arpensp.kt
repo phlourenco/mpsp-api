@@ -9,7 +9,7 @@ data class ArpenspRequest(
 data class ArpenspResponse(
     val spouse1OldName: String,
     val spouse1NewName: String,
-    val spouse21OldName: String,
-    val spouse21NewName: String,
+    val spouse2OldName: String,
+    val spouse2NewName: String,
     val marriageDate: String
 )
