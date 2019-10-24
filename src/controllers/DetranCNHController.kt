@@ -22,7 +22,7 @@ fun Route.detranCNHController() {
         driver.findElementById("form:j_id563205015_44efc15b").click()
         waitUntilPageIsReady(driver)
         driver.findElementById("navigation_a_M_16").click()
-        moveTo(driver, "Consultar Imagem da CNH",true)
+        driver.findElementsById("navigation_a_F_16").first { it.text == "Consultar Imagem da CNH" }.click()
         driver.findElementById("form:cpf").sendKeys(req.cpf)
         moveTo(driver,"Pesquisar",true)
         val tabs = ArrayList(driver.windowHandles)
