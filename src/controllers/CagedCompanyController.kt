@@ -35,9 +35,9 @@ fun Route.cagedCompanyController() {
         val companyCnae2 = driver.findElementById("formResumoEmpresaCaged:txtDescricaoAtividadeEconomica").text
         val companyCnaeFull = companyCnae + " - " + companyCnae2
 
-        val subsidiaries = driver.findElementById("formResumoEmpresaCaged:txtNumFiliais").text
-        val admissions = driver.findElementById("formResumoEmpresaCaged:txtTotalNumAdmissoes").text
-        val demissions = driver.findElementById("formResumoEmpresaCaged:txtTotalNumDesligamentos").text
+        val subsidiaries = driver.findElementById("formResumoEmpresaCaged:txtNumFiliais").text.toInt()
+        val admissions = driver.findElementById("formResumoEmpresaCaged:txtTotalNumAdmissoes").text.toInt()
+        val demissions = driver.findElementById("formResumoEmpresaCaged:txtTotalNumDesligamentos").text.toInt()
 
         val response = CagedCompanyResponse(companyCnpj, companySocialReason, companyCnaeFull, subsidiaries, admissions, demissions)
 

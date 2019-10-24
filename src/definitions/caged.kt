@@ -43,9 +43,9 @@ data class CagedCompanyResponse(
     val cnpj: String,
     val name: String,
     val cnae: String,
-    val subsidiaries: String,
-    val admissions: String,
-    val demissions: String
+    val subsidiaries: Int,
+    val admissions: Int,
+    val demissions: Int
 )
 
 // Caged Worker
