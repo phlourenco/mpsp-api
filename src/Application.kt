@@ -14,6 +14,9 @@ fun main(args: Array<String>): Unit = EngineMain.main(args)
 @JvmOverloads
 
 fun Application.module(testing: Boolean = false) {
+
+    DatabaseService.setup()
+
     install(CORS)
     {
         anyHost()
