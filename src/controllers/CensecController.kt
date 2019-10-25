@@ -3,7 +3,6 @@ import com.google.gson.Gson
 import com.phlourenco.definitions.CensecPart
 import com.phlourenco.definitions.CensecRequest
 import com.phlourenco.definitions.CensecResponse
-import com.phlourenco.definitions.CensecResponseItem
 import io.ktor.application.call
 import io.ktor.request.header
 import io.ktor.request.receive
@@ -70,7 +69,7 @@ fun Route.censecController() {
             arrayParts.add(part)
         }
 
-        val response = CensecResponseItem(
+        val response = CensecResponse(
             office,
             date,
             act,

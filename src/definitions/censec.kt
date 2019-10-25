@@ -5,10 +5,7 @@ data class CensecRequest(
 )
 
 data class CensecResponse(
-    val list: List<CensecResponseItem>
-)
-
-data class CensecResponseItem(
+//    val list: List<CensecResponseItem>
     val office: String,
     val date: String,
     val act: String,
@@ -19,6 +16,18 @@ data class CensecResponseItem(
     val pageComplement: String,
     val parts: List<CensecPart>
 )
+
+//data class CensecResponseItem(
+//    val office: String,
+//    val date: String,
+//    val act: String,
+//    val actDate: String,
+//    val book: String,
+//    val bookComplement: String,
+//    val page: String,
+//    val pageComplement: String,
+//    val parts: List<CensecPart>
+//)
 
 data class CensecPart(
     val name: String,
