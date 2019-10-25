@@ -12,6 +12,7 @@ import org.openqa.selenium.chrome.ChromeOptions
 import java.net.URL
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.phlourenco.utils.closeAllTabs
 import io.ktor.request.header
 import org.json.JSONObject
 import java.util.*
@@ -47,7 +48,7 @@ fun Route.arispController() {
         driver.findElementById("Prosseguir").click()
         waitUntilPageIsReady(driver)
 
-        val cities = listOf<String>() //listOf<String>("AGUAÍ", "ÁGUAS DE LINDÓIA")
+        val cities = req.cityNames
 
         if (cities.isNullOrEmpty()) {
             driver.executeScript("javascript:SelecionarTudo();")
@@ -106,7 +107,8 @@ fun Route.arispController() {
             driver.switchTo().window(tabs[0])
         }
 
-        driver.close();
+
+        driver.closeAllTabs()
         val response = ArispResponse(registries);
 
         call.request.header("reportId")?.apply {

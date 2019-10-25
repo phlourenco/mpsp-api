@@ -2,6 +2,7 @@ package com.phlourenco.controllers
 
 import com.google.gson.Gson
 import com.phlourenco.definitions.*
+import com.phlourenco.utils.closeAllTabs
 import io.ktor.application.call
 import io.ktor.request.header
 import io.ktor.request.receive
@@ -58,7 +59,7 @@ fun Route.cagedResponsibleController() {
             CagedResponsibleContact(contactName, contactCpf, "${contactDdd}${contactPhone}", contactLine, contactEmail)
         )
 
-        driver.close()
+        driver.closeAllTabs()
 
         call.request.header("reportId")?.apply {
             val responseMap = response.serializeToMap().toMutableMap()

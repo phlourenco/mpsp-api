@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.phlourenco.definitions.ArpenspRequest
 import com.phlourenco.definitions.CadespRequest
 import com.phlourenco.definitions.CadespResponse
+import com.phlourenco.utils.closeAllTabs
 import io.ktor.application.call
 import io.ktor.request.header
 import io.ktor.request.receive
@@ -65,7 +66,7 @@ fun Route.cadespController() {
         val practices = td[29].text
         val response: CadespResponse = CadespResponse(ie, cnpj, businessName, drt, situation, dateStateRegistration, stateRegime, taxOffice, fantasyName, nire, registrationSituation, taxOccurrence, unitType, ieStartDate, dateStartedSituation, practices);
 
-        driver.close()
+        driver.closeAllTabs()
 
         call.request.header("reportId")?.apply {
             val responseMap = response.serializeToMap().toMutableMap()

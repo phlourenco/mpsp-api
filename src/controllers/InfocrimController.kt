@@ -3,6 +3,7 @@ package com.phlourenco.controllers
 import com.google.gson.Gson
 import com.phlourenco.definitions.InfocrimRequest
 import com.phlourenco.definitions.InfocrimResponse
+import com.phlourenco.utils.closeAllTabs
 import io.ktor.application.call
 import io.ktor.request.header
 import io.ktor.request.receive
@@ -62,7 +63,7 @@ fun Route.infocrimController() {
                 stringToPdf(driver.pageSource)?.let {
                     val pdfUrl = uploadToS3(it)
                     val response = InfocrimResponse(pdfUrl)
-                    driver.close()
+                    driver.closeAllTabs()
 
 
                     call.request.header("reportId")?.apply {

@@ -3,6 +3,7 @@ package com.phlourenco.controllers
 import com.google.gson.Gson
 import com.phlourenco.definitions.JucespRequest
 import com.phlourenco.definitions.JucespResponse
+import com.phlourenco.utils.closeAllTabs
 import io.ktor.application.call
 import io.ktor.request.header
 import io.ktor.request.receive
@@ -63,7 +64,7 @@ fun Route.jucespController() {
                 city,
                 s3Link)
 
-            driver.close()
+            driver.closeAllTabs()
 
             call.request.header("reportId")?.apply {
                 val responseMap = response.serializeToMap().toMutableMap()
