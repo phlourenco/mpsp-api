@@ -6,6 +6,7 @@ import io.ktor.application.*
 import io.ktor.routing.*
 import io.ktor.gson.*
 import io.ktor.features.*
+import io.ktor.http.HttpHeaders
 import io.ktor.server.netty.EngineMain
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
@@ -20,6 +21,7 @@ fun Application.module(testing: Boolean = false) {
     install(CORS)
     {
         anyHost()
+        header("reportId")
     }
 
     install(ContentNegotiation) {
