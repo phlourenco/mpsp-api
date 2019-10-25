@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.phlourenco.definitions.Address
 import com.phlourenco.definitions.SivecRequest
 import com.phlourenco.definitions.SivecResponse
+import com.phlourenco.utils.closeAllTabs
 import io.ktor.application.call
 import io.ktor.request.header
 import io.ktor.request.receive
@@ -51,7 +52,7 @@ fun Route.sivecController() {
             Address(results[28].text, results[29].text)
         )
 
-        driver.close()
+        driver.closeAllTabs()
 
         call.request.header("reportId")?.apply {
             val responseMap = response.serializeToMap().toMutableMap()

@@ -3,7 +3,7 @@ import com.google.gson.Gson
 import com.phlourenco.definitions.CensecPart
 import com.phlourenco.definitions.CensecRequest
 import com.phlourenco.definitions.CensecResponse
-import com.phlourenco.definitions.CensecResponseItem
+import com.phlourenco.utils.closeAllTabs
 import io.ktor.application.call
 import io.ktor.request.header
 import io.ktor.request.receive
@@ -70,7 +70,7 @@ fun Route.censecController() {
             arrayParts.add(part)
         }
 
-        val response = CensecResponseItem(
+        val response = CensecResponse(
             office,
             date,
             act,
@@ -85,7 +85,7 @@ fun Route.censecController() {
 //        val list = listOf<CensecResponseItem>(item)
 //        val response = CensecResponse(list)
 
-        driver.close()
+        driver.closeAllTabs()
 
         call.request.header("reportId")?.apply {
             val responseMap = response.serializeToMap().toMutableMap()

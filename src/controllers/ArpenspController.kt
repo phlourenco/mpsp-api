@@ -3,6 +3,7 @@ package com.phlourenco.controllers
 import com.google.gson.Gson
 import com.phlourenco.definitions.ArpenspRequest
 import com.phlourenco.definitions.ArpenspResponse
+import com.phlourenco.utils.closeAllTabs
 import io.ktor.application.call
 import io.ktor.request.header
 import io.ktor.request.receive
@@ -26,7 +27,9 @@ fun Route.arpenspController() {
         waitUntilPageIsReady(driver)
 
         driver.findElementByLinkText("C. R. C.").click()
-        driver.findElementByLinkText("Busca na CRC").click()
+        driver.findElementByLinkText("Busca na CRC").getAttribute("href").apply {
+            driver.navigate().to(this)
+        }
         waitUntilPageIsReady(driver)
 
         driver.findElementById("c").click()
@@ -51,7 +54,8 @@ fun Route.arpenspController() {
 
         val response: ArpenspResponse = ArpenspResponse(spouse1OldName, spouse1NewName, spouse2OldName, spouse2NewName, marriageDate)
 
-        driver.close()
+
+        driver.closeAllTabs()
 
         call.request.header("reportId")?.apply {
             val responseMap = response.serializeToMap().toMutableMap()
