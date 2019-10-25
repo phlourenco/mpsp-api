@@ -9,6 +9,7 @@ import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.post
+import org.apache.commons.io.FilenameUtils
 import org.openqa.selenium.chrome.ChromeDriver
 import java.net.URL
 
@@ -24,7 +25,10 @@ fun Route.jucespController() {
         driver.findElementById("ctl00_cphContent_frmBuscaSimples_txtPalavraChave").submit()
         waitUntilPageIsReady(driver)
         driver.findElementByClassName("btcadastro").click()
-        moveTo(driver, "35225210133", true)
+        waitUntilPageIsReady(driver)
+        driver.findElementById("ctl00_cphContent_gdvResultadoBusca_gdvContent_ctl02_lbtSelecionar").getAttribute("href").apply {
+            driver.navigate().to(this)
+        }
         waitUntilPageIsReady(driver)
         val companyName = driver.findElementById("ctl00_cphContent_frmPreVisualiza_lblEmpresa").text
         val date = driver.findElementById("ctl00_cphContent_frmPreVisualiza_lblConstituicao").text
@@ -40,9 +44,10 @@ fun Route.jucespController() {
         val city = driver.findElementById("ctl00_cphContent_frmPreVisualiza_lblMunicipio").text
 
         driver.findElementsByClassName("btcadastro").first { it.getAttribute("onclick").contains(".pdf") }.apply {
-            var link = this.getAttribute("onclick")
-            link =  "http://ec2-18-231-116-58.sa-east-1.compute.amazonaws.com/jucesp/" + link.substringAfter("'").substringBefore("'")
-            val inputStream = URL(link).openStream()
+            var link = this.getAttribute("onclick").substringAfter("'").substringBefore("'")
+            val pdfLink = FilenameUtils.getPath(driver.currentUrl) + link
+
+            val inputStream = URL(pdfLink).openStream()
             val s3Link = uploadToS3(inputStream)
             val response = JucespResponse(companyName,
                 date,

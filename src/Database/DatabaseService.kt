@@ -13,8 +13,8 @@ class DatabaseService {
     var database: MongoDatabase? = null
 
     fun setup() {
-//        val uri = MongoClientURI("mongodb+srv://phlourenco:Z0uz2nGmBpB59neh@fiap-morcegos-rytvg.mongodb.net/mpsp?retryWrites=true&w=majority")
-        val uri = MongoClientURI("mongodb://localhost:27017/mpsp")
+        val uri = MongoClientURI("mongodb+srv://phlourenco:Z0uz2nGmBpB59neh@fiap-morcegos-rytvg.mongodb.net/mpsp?retryWrites=true&w=majority")
+//        val uri = MongoClientURI("mongodb://localhost:27017/mpsp")
         database = KMongo.createClient(uri = uri).getDatabase(uri.database)
     }
 
