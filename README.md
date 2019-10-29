@@ -1,8 +1,8 @@
-#mpsp-api
+# mpsp-api
 
 API scrapper to get data from more than 10 governments websites.
 
-We hope you will. because it looks better than the legacy systems they have.
+We hope that MPSP use this, because it looks better than the legacy systems they have.
 
 ## Running
 mpsp-api is a scrapper maded with kotlin, using kTor framework and Selenium.
